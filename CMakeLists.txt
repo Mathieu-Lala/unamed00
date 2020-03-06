@@ -122,11 +122,14 @@ include(src/app/app.cmake)
 set(APP_NAME app)
 make_app(${APP_NAME})
 
+find_package(Threads)
+
 ## And linking binaries with libaries
 target_link_libraries(${APP_NAME}
     ${LIB_TOTO}
     ${LIB_TATA}
     ${LIB_DLL}
+    ${CMAKE_THREAD_LIBS_INIT}
 )
 
 ## If the build type is "Release", generate the documentation

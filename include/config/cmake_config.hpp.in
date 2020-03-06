@@ -18,9 +18,9 @@
 # define PROJECT_VERSION_TWEAK @PROJECT_VERSION_TWEAK@ /*!< @brief Version Tweak */
 
 # define PROJECT_BUILD_TYPE @PROJECT_BUILD_TYPE@ /*!< @brief Build Type used */
-# define PROJECT_BUILD_TYPE_AS_STRING AS_STRING(PROJECT_BUILD_TYPE)
+# define PROJECT_BUILD_TYPE_AS_STRING AS_STRING(PROJECT_BUILD_TYPE) /*!< @brief Build Type as string */
 
-# define BIN_OUTPUT_DIR "@BIN_OUTPUT_DIR@"
-# define LIB_OUTPUT_DIR "@LIB_OUTPUT_DIR@"
+# define BIN_OUTPUT_DIR "@BIN_OUTPUT_DIR@" /*!< @brief Folder containing binaries */
+# define LIB_OUTPUT_DIR "@LIB_OUTPUT_DIR@" /*!< @brief Folder containing libaries */
 
 #endif /* !CMAKE_CONFIG_HPP_ */

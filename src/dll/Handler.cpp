@@ -1,5 +1,5 @@
 /**
- * @file include/dll/Handler.hpp
+ * @file src/app/dll/Handler.cpp
  *
  */
 
@@ -60,4 +60,9 @@ bool dll::Handler::close()
 # endif
     this->m_handler = EMPTY;
     return !res;
+}
+
+const std::string &dll::Handler::getPath() const noexcept
+{
+    return this->m_libpath;
 }

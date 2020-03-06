@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef HANDLER_HPP_
-# define HANDLER_HPP_
+#ifndef DLL_HANDLER_HPP_
+# define DLL_HANDLER_HPP_
 
 # include <string>
 
@@ -52,6 +52,8 @@ public:
         }
     }
 
+    const std::string &getPath() const noexcept;
+
 protected:
 private:
 
@@ -70,4 +72,4 @@ private:
 
 } // namespace dll
 
-#endif /* !HANDLER_HPP_ */
+#endif /* !DLL_HANDLER_HPP_ */
