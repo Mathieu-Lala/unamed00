@@ -1,0 +1,23 @@
+# This file describes the settings to be used by the documentation system
+# doxygen (www.doxygen.org).
+
+PROJECT_NAME        = "@PROJECT_NAME@"
+PROJECT_NUMBER      = @PROJECT_VERSION@
+PROJECT_BRIEF       = "@PROJECT_DESCRIPTION@"
+PROJECT_LOGO        = @ROOT_DIR@/media/logo/ISO_C++_Logo_small.svg.png
+
+OUTPUT_DIRECTORY    = @ROOT_DIR@/build/doc_doxygen/
+
+USE_MDFILE_AS_MAINPAGE = README.md
+
+INPUT               = \
+    @ROOT_DIR@/README.md \
+    @ROOT_DIR@/LICENSE.md \
+    @ROOT_DIR@/src \
+    @ROOT_DIR@/include \
+    @ROOT_DIR@/tests \
+    @ROOT_DIR@/build/docs/extra_doc.hpp
+
+RECURSIVE            = YES
+ENABLE_PREPROCESSING = YES
+MACRO_EXPANSION      = YES

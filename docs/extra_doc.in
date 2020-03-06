@@ -1,0 +1,7 @@
+/**
+ * @file extra_doc.hpp
+ * @brief Just a file to add extra page to Doxygen documentation
+ * @page DI Packages And Dependencies
+ * @htmlinclude @ROOT_DIR@/build/docs/package.html
+ * @htmlinclude @ROOT_DIR@/build/coverage/index.html
+ */

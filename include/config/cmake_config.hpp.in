@@ -1,0 +1,26 @@
+/**
+ * @file include/config/cmake_config.hpp
+ * @brief Data receive from cmake settings
+ *
+ */
+
+#ifndef CMAKE_CONFIG_HPP_
+# define CMAKE_CONFIG_HPP_
+
+# include "config/macro.hpp"
+
+# define PROJECT_NAME "@PROJECT_NAME@" /*!< @brief Name of the project */
+# define PROJECT_VERSION "@PROJECT_VERSION@" /*!< @brief Full Version as string */
+
+# define PROJECT_VERSION_MAJOR @PROJECT_VERSION_MAJOR@ /*!< @brief Version Major */
+# define PROJECT_VERSION_MINOR @PROJECT_VERSION_MINOR@ /*!< @brief Version Minor */
+# define PROJECT_VERSION_PATCH @PROJECT_VERSION_PATCH@ /*!< @brief Version Patch */
+# define PROJECT_VERSION_TWEAK @PROJECT_VERSION_TWEAK@ /*!< @brief Version Tweak */
+
+# define PROJECT_BUILD_TYPE @PROJECT_BUILD_TYPE@ /*!< @brief Build Type used */
+# define PROJECT_BUILD_TYPE_AS_STRING AS_STRING(PROJECT_BUILD_TYPE)
+
+# define BIN_OUTPUT_DIR "@BIN_OUTPUT_DIR@"
+# define LIB_OUTPUT_DIR "@LIB_OUTPUT_DIR@"
+
+#endif /* !CMAKE_CONFIG_HPP_ */
