@@ -66,27 +66,16 @@ void shell::Parser::list(const std::vector<std::string> &)
 
 void shell::Parser::load(const std::vector<std::string> &command)
 {
-    switch (command.size()) {
-    case 2:
-        if (!this->m_core.getDllManager().load(command[1]))
-            std::cout << "No such libary: " + command[1] << std::endl;
-        else
-            std::cout << command[1] << " loaded" << std::endl;
-        break;
-
-    case 3:
-        if (!this->m_core.getDllManager().load(command[2], command[1]))
-            std::cout << "No such libary: " + command[2] << std::endl;
-        else
-            std::cout << command[2] << " (= " << command[1] << ") loaded" << std::endl;
-        break;
-
-    default:
+    if (command.size() != 3) {
         std::cout <<
             "Usage: load <alias> <lib_name>" << std::endl <<
             "Example: load lib#01 toto" << std::endl;
-        break;
+        return;
     }
+    if (!this->m_core.getDllManager().load(command[2], command[1]))
+        std::cout << "No such libary: '" + command[2] << "' or alias '" << command[1] << "' already used" << std::endl;
+    else
+        std::cout << command[2] << " (= " << command[1] << ") loaded" << std::endl;
 }
 
 void shell::Parser::unload(const std::vector<std::string> &command)
@@ -97,4 +86,6 @@ void shell::Parser::unload(const std::vector<std::string> &command)
     }
     if (!this->m_core.getDllManager().unload(command[1]))
         std::cout << "No such libary: " + command[2] << std::endl;
+    else
+        std::cout << command[1] << " unloaded" << std::endl;
 }

@@ -22,21 +22,25 @@ void dll::Manager::clear()
 
 bool dll::Manager::load(const std::string &name, const std::string &alias)
 {
-    dll::Handler handler(this->m_path + name_to_path(name));
-    if (!handler.is_valid())
+    if (this->m_handlers.find(alias) != this->m_handlers.end())
         return false;
 
-    this->m_handlers.insert(std::make_pair(alias, std::move(handler)));
+    auto handler = new dll::Handler(this->m_path + name_to_path(name));
+    if (!handler->is_valid()) {
+        delete handler;
+        return false;
+    }
+
+    this->m_handlers.insert({ alias, handler });
     return true;
 }
 
 bool dll::Manager::unload(const std::string &alias)
 {
-    const auto &it = this->m_handlers.find(alias);
-    if (it == this->m_handlers.end())
-        return false;
-    this->m_handlers.erase(it);
-    return true;
+    const auto found = this->m_handlers.find(alias);
+    if (found != this->m_handlers.end())
+        delete found->second;
+    return !!this->m_handlers.erase(alias);
 }
 
 std::vector<dll::Manager::HandlerInfo> dll::Manager::list() const
@@ -44,6 +48,6 @@ std::vector<dll::Manager::HandlerInfo> dll::Manager::list() const
     std::vector<HandlerInfo> out(this->m_handlers.size());
     std::size_t i = 0;
     for (const auto &[alias, handler] : this->m_handlers)
-        out[i++] = { alias, handler.getPath() };
+        out[i++] = { alias, handler->getPath() };
     return out;
 }

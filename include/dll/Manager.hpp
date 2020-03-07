@@ -8,12 +8,13 @@
 
 # include <unordered_map>
 # include <vector>
+# include <memory>
 
 # include "dll/Handler.hpp"
 
 namespace dll {
 
-class Manager {
+class API_EXPORT Manager {
 public:
     Manager() = default;
     ~Manager() = default;
@@ -22,7 +23,7 @@ public:
 
     void clear();
 
-    bool load(const std::string &name, const std::string &alias = "<anon>");
+    bool load(const std::string &name, const std::string &alias);
     bool unload(const std::string &alias);
 
     struct HandlerInfo {
@@ -39,7 +40,7 @@ private:
 
     std::string m_path;
 
-    std::unordered_multimap<std::string, Handler> m_handlers;
+    std::unordered_map<std::string, Handler *> m_handlers;
 
 };
 
