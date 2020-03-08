@@ -24,12 +24,12 @@ public:
 protected:
 private:
 
+    static const std::function<std::string()> sc_callback;
+
     Parser &m_parser;
 
     void reset();
-
-    std::function<std::string()> m_callback;
-    std::future<std::string> m_promise;
+    std::future<std::string> m_future;
 
 };
 

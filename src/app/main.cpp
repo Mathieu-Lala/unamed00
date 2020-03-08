@@ -4,59 +4,40 @@
  *
  */
 
-#include <csignal>
 #include <iostream>
 
-#include "config/cmake_config.hpp"
-#include "config/platform.hpp"
+#include "config/macro.hpp"
 
 #include "app/Core.hpp"
 #include "app/shell/Reader.hpp"
 #include "app/shell/Parser.hpp"
 
-void show_info()
+void init()
 {
-    std::cout <<
-        "PROJECT NAME: " << PROJECT_NAME << " " << std::endl <<
-        "VESTION: " << PROJECT_VERSION << std::endl <<
-        "BUILD TYPE: " << PROJECT_BUILD_TYPE_AS_STRING << std::endl <<
-        "PLATFORM: " << OS_AS_STRING <<
-    std::endl;
+    std::set_terminate([] {
+        std::cout << "Program terminated" << std::endl;
+        std::exit(APP_SUCCESS);
+    });
+
+    std::atexit([] { std::cout << "Application exited" << std::endl; });
 }
 
 /**
  * @brief entry point of the application
  */
 int main()
-try {
+{
+    init();
 
-    show_info();
-
-    static Core core;
-
-# if defined(OS_LINUX)
-    core.getDllManager().setPath(LIB_OUTPUT_DIR "/");
-# elif defined(OS_WINDOWS)
-    core.getDllManager().setPath(BIN_OUTPUT_DIR "/");
-# endif
-
+    Core core;
     shell::Parser parser(core);
-    shell::Reader reader(parser);
-
-    std::signal(SIGINT, [](int) { core.stop();
-        /* todo: close all the thread (ex: shell::reader future) */ });
+    shell::Reader terminal(parser);
 
     while (core.isRunning()) {
 
-        reader.read();
+        terminal.read();
 
     }
 
-    return APP_SUCCESS;
-
-}
-catch (const std::logic_error &e)
-{
-    std::cout << e.what() << std::endl;
     return APP_SUCCESS;
 }

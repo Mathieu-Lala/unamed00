@@ -7,6 +7,8 @@
 # define SHELL_PARSER_HPP_
 
 # include <string>
+# include <unordered_map>
+# include <vector>
 
 class Core;
 
@@ -24,7 +26,17 @@ private:
 
     Core &m_core;
 
+    using signature = void (Parser::*)(const std::vector<std::string> &);
+    std::unordered_map<std::string, signature> m_mapCallback;
+
+    void help(const std::string &);
+    void help(const std::vector<std::string> &);
+
+    void version(const std::vector<std::string> &);
+
+    void exit(const std::vector<std::string> &);
     void list(const std::vector<std::string> &);
+
     void load(const std::vector<std::string> &);
     void unload(const std::vector<std::string> &);
 

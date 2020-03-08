@@ -37,7 +37,7 @@ public:
     bool close();
 
     template<typename T>
-    bool load(const std::string_view symbol_name, T &data)
+    bool load(const std::string_view symbol_name, T &data) const
     {
 # if defined(OS_LINUX)
         auto symbol = ::dlsym(this->m_handler, symbol_name.data());

@@ -2,9 +2,9 @@
 
 cmake_minimum_required(VERSION 3.14)
 
-set(PROJECT_NAME __ProjectName__)
-set(PROJECT_DESCRIPTION "__ProjectDescription__")
-set(PROJECT_HOMEPAGE_URL "https://github.com/Mathieu-Lala/template_cpp_project")
+set(PROJECT_NAME unamed00)
+set(PROJECT_DESCRIPTION "Not a named project")
+set(PROJECT_HOMEPAGE_URL "https://github.com/Mathieu-Lala/unamed00")
 
 ## Build Info
 

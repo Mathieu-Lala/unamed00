@@ -1,15 +1,8 @@
-# template_cpp_project
-
-Template for C / C++ project
+# unamed00
 
 ## Getting Started
 
-This project is a template for C / C++ project with :
-
-* cross-platform build
-* documentation generator
-* units tests
-* packages and dependencies manager
+This project was generated from [this template](https://github.com/Mathieu-Lala/template_cpp_project)
 
 ### Prerequisite
 
@@ -24,7 +17,7 @@ Building on unix platform :
 $> ./make.sh [Debug|Release]
 ```
 
-You can also generate a Visual Studio solution from this repo
+You can also generate a Visual Studio solution from this repo.
 
 ## Running the tests
 
@@ -34,7 +27,7 @@ To build the tests :
 $> ./make.sh Test
 ```
 
-After that, to generate the coverage as html (build/coverage/index.html):
+After that, to generate the coverage as html (in build/coverage/index.html):
 
 ```bash
 $> make -C build coverage

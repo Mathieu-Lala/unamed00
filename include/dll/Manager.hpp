@@ -9,6 +9,7 @@
 # include <unordered_map>
 # include <vector>
 # include <memory>
+# include <regex>
 
 # include "dll/Handler.hpp"
 
@@ -16,7 +17,7 @@ namespace dll {
 
 class API_EXPORT Manager {
 public:
-    Manager() = default;
+    Manager();
     ~Manager() = default;
 
     void setPath(const std::string &path) { m_path = path; }
@@ -33,6 +34,8 @@ public:
 
     std::vector<HandlerInfo> list() const;
 
+    std::vector<std::string> getAvailable() const;
+
 protected:
 private:
 
@@ -40,7 +43,21 @@ private:
 
     std::string m_path;
 
-    std::unordered_map<std::string, Handler *> m_handlers;
+    std::unordered_map<std::string, std::shared_ptr<Handler>> m_handlers;
+
+# if defined(OS_LINUX)
+    static constexpr auto DEFAULT_PATH = LIB_OUTPUT_DIR;
+    static constexpr auto LIBNAME_PATTERN_HEAD = "lib";
+    static constexpr auto LIBNAME_PATTERN_TAIL = ".so";
+
+# elif defined(OS_WINDOWS)
+    static constexpr auto DEFAULT_PATH = BIN_OUTPUT_DIR;
+    static constexpr auto LIBNAME_PATTERN_HEAD = "";
+    static constexpr auto LIBNAME_PATTERN_TAIL = ".dll";
+
+# endif
+
+    static const std::regex sc_libname_pattern;
 
 };
 

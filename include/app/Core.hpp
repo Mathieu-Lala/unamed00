@@ -1,5 +1,5 @@
 /**
- * @file src/app/Core.hpp
+ * @file include/app/Core.hpp
  *
  */
 
@@ -15,10 +15,10 @@ public:
     Core() = default;
     ~Core() = default;
 
-    void stop() { m_is_running = false; }
-    bool isRunning() const { return m_is_running; }
+    void stop() noexcept { m_is_running = false; }
+    bool isRunning() const noexcept { return m_is_running; }
 
-    dll::Manager &getDllManager() { return m_dllManager; }
+    dll::Manager &getDllManager() noexcept { return m_dllManager; }
 
 protected:
 private:
