@@ -19,7 +19,7 @@
 
 namespace dll {
 
-class API_EXPORT Handler {
+class DECLSPEC Handler {
 public:
     Handler() noexcept;
     Handler(Handler &&) noexcept;

@@ -27,25 +27,16 @@
 
 # define LIB_TYPE_AS_STRING AS_STRING(LIB_TYPE)
 
-# if (defined(OS_WINDOWS))
-#  define _EXPORT_ __declspec(dllexport)
-#  define _IMPORT_ __declspec(dllimport)
-# else
-#  define _EXPORT_
-#  define _IMPORT_
-# endif
-
-# if (LIB_TYPE == MAIN)
-#  define API_IMPORT _IMPORT_
-#  define API_EXPORT _EXPORT_
-
-# elif (LIB_TYPE == STATIC)
-#  define API_IMPORT
-#  define API_EXPORT _EXPORT_
-
-# elif (LIB_TYPE == SHARED)
-#  define API_IMPORT _IMPORT_
-#  define API_EXPORT _EXPORT_
+# ifndef DECLSPEC
+#  if defined(OS_WINDOWS)
+#   ifdef LIB_TYPE != SHARED
+#    define DECLSPEC __declspec(dllexport)
+#   else
+#    define DECLSPEC
+#   endif
+#  else
+#   define DECLSPEC
+#  endif
 # endif
 
 #endif /* !CONFIG_API_HPP_ */

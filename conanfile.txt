@@ -2,7 +2,11 @@
 doxygen_installer/1.8.15@bincrafters/stable
 Catch2/2.11.1@catchorg/stable
 
-[options]
+sfml/2.5.1@bincrafters/stable
 
 [generators]
 cmake
+
+[options]
+    sfml:graphics=True
+    sfml:window=True

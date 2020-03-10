@@ -7,13 +7,12 @@
 #include <catch2/catch.hpp>
 
 #include "dll/Handler.hpp"
-
-#include <tata/tata.hpp>
+#include "graphic/IWindow.hpp"
 
 TEST_CASE("Test DLL :: Handler")
 {
     {
-        dll::Handler invalidHandler("toto");
+        dll::Handler invalidHandler("not a valid path");
         REQUIRE(!invalidHandler.is_valid());
         REQUIRE(!invalidHandler.close());
         dll::Handler movedInvalid(std::move(invalidHandler));
@@ -21,7 +20,7 @@ TEST_CASE("Test DLL :: Handler")
 
     dll::Handler handler;
     {
-        dll::Handler tmp(LIB_OUTPUT_DIR "/libtata.so");
+        dll::Handler tmp(LIB_OUTPUT_DIR "/libmodule-graphic-sfml.so");
         REQUIRE(tmp.is_valid());
         handler = std::move(tmp);
     }
@@ -29,19 +28,18 @@ TEST_CASE("Test DLL :: Handler")
     REQUIRE(handler.is_valid());
     handler.close();
     REQUIRE(!handler.is_valid());
-    handler.open(LIB_OUTPUT_DIR "/libtata.so");
+    handler.open(LIB_OUTPUT_DIR "/libmodule-graphic-sfml.so");
     REQUIRE(handler.is_valid());
 
-    {
-        using type = Tata (*)();
-        type func = nullptr;
-
-        REQUIRE(handler.load("create_tata", func));
-        REQUIRE(func != nullptr);
-    }
     {
         using type = char *;
         type data;
         REQUIRE(!handler.load("foobar", data));
+    }
+
+    {
+        using type = graphic::IWindow *(*)();
+        type data;
+        REQUIRE(handler.load("createWindow", data));
     }
 }

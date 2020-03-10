@@ -10,27 +10,30 @@
 # include <future>
 # include <string>
 
-namespace shell {
+# include "app/IParser.hpp"
 
-class Parser;
+namespace shell {
 
 class Reader {
 public:
-    Reader(Parser &);
+    Reader(IParser &);
     ~Reader() = default;
 
     bool read();
 
+    void kill();
+
 protected:
 private:
 
-    static const std::function<std::string()> sc_callback;
+    IParser &m_parser;
 
-    Parser &m_parser;
-
+    std::atomic<bool> m_is_running;
     void reset();
+
     std::future<std::string> m_future;
 
+    const std::function<std::string()> c_callback;
 };
 
 } // namespace shell

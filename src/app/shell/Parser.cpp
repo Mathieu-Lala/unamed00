@@ -38,21 +38,16 @@ shell::Parser::Parser(Core &core) :
     // ...
 }
 
-bool shell::Parser::parse(const std::string &str)
+void shell::Parser::parse(const std::string &str)
 {
-    if (!str.size())
-        return false;
-
-    const auto &exploded = explode(str, ' ');
+    const auto &exploded = str.size() ? explode(str, ' ') : std::vector<std::string>({ "" });
 
     try {
         const auto &ptrAction = m_mapCallback.at(exploded[0]);
         (this->*ptrAction)(exploded);
-        return ptrAction != &Parser::exit;
 
     } catch (const std::out_of_range &) {
         std::cout << "shell: " << exploded[0] << ": command not found..." << std::endl;
-        return true;
     }
 }
 

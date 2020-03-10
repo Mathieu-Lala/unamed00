@@ -6,20 +6,21 @@
 #ifndef SHELL_PARSER_HPP_
 # define SHELL_PARSER_HPP_
 
-# include <string>
 # include <unordered_map>
 # include <vector>
+
+# include "app/IParser.hpp"
 
 class Core;
 
 namespace shell {
 
-class Parser {
+class Parser : public IParser {
 public:
     Parser(Core &);
-    ~Parser() = default;
+    virtual ~Parser() = default;
 
-    bool parse(const std::string &string);
+    void parse(const std::string &string) final;
 
 protected:
 private:

@@ -8,20 +8,21 @@
 #include <thread>
 
 #include "app/shell/Reader.hpp"
-#include "app/shell/Parser.hpp"
 
-const std::function<std::string()> shell::Reader::sc_callback =
-[]{
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    std::cout << "$> ";
+shell::Reader::Reader(IParser &parser) :
+    m_parser        (parser),
+    m_is_running    (false),
+    c_callback  ([this]{
 
-    std::string line;
-    std::getline(std::cin, line);
-    return line;
-};
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::cout << "$> ";
 
-shell::Reader::Reader(Parser &parser) :
-    m_parser    (parser)
+        std::string line;
+        if (!std::getline(std::cin, line))
+            this->m_is_running = false;
+        return line;
+
+    })
 {
     if (std::signal(SIGINT, [](int) {
         std::cout << std::endl << "POSIX signal SIGINT receive" << std::endl;
@@ -39,13 +40,22 @@ bool shell::Reader::read()
     if (this->m_future.wait_for(std::chrono::microseconds(0)) != std::future_status::ready)
         return false;
 
-    if (this->m_parser.parse(this->m_future.get()))
-        this->reset();
+    this->m_parser.parse(this->m_is_running ? this->m_future.get() : "exit");
+    this->reset();
 
     return true;
 }
 
 void shell::Reader::reset()
 {
-    this->m_future = std::async(std::launch::async, this->sc_callback);
+    this->m_future = std::async(std::launch::async, this->c_callback);
+    this->m_is_running = true;
+}
+
+void shell::Reader::kill()
+{
+    if (!this->m_is_running)
+        return;
+
+    std::thread([](const auto &) { std::terminate(); }, std::ref(this->m_future)).detach();
 }

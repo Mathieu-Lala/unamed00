@@ -12,6 +12,9 @@
 #include "app/shell/Reader.hpp"
 #include "app/shell/Parser.hpp"
 
+#include "graphic/Event.hpp"
+#include "graphic/IWindow.hpp"
+
 void init()
 {
     std::set_terminate([] {
@@ -33,11 +36,35 @@ int main()
     shell::Parser parser(core);
     shell::Reader terminal(parser);
 
-    while (core.isRunning()) {
+    const auto getWindow = [&core](
+        const std::string &module_name,
+        const std::string &symobl_name = "createWindow",
+        const std::string &module_alias = "default_lib_graphic") {
+
+        graphic::IWindow *(*createWindow)();
+        core.getDllManager().load(module_name, module_alias);
+        core.getDllManager().get(module_alias)->load(symobl_name, createWindow);
+        return std::unique_ptr<graphic::IWindow>(createWindow());
+    };
+
+    auto window = getWindow("module-graphic-sfml");
+
+    while (core.isRunning() && window->isRunning()) {
 
         terminal.read();
 
+        window->clear(0x00);
+        // draw here
+        window->render();
+
+        graphic::Event e;
+        window->pollEvent(e);
+        if (e.type == graphic::Event::CLOSED)
+            window->close();
+
     }
+
+    terminal.kill();
 
     return APP_SUCCESS;
 }

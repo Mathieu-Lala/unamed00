@@ -17,7 +17,7 @@ Building on unix platform :
 $> ./make.sh [Debug|Release]
 ```
 
-You can also generate a Visual Studio solution from this repo.
+You can also generate a Visual Studio Solution from this repo.
 
 ## Running the tests
 

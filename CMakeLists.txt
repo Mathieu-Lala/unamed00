@@ -97,17 +97,11 @@ message(STATUS "C++ Standard: " ${CMAKE_CXX_STANDARD} " C++ Flags: " ${CMAKE_CXX
 
 ## Generation of libaries
 
-include(src/toto/toto.cmake)
-set(LIB_TOTO toto)
-make_toto(${LIB_TOTO} STATIC)
-
-include(src/tata/tata.cmake)
-set(LIB_TATA tata)
-make_tata(${LIB_TATA} SHARED)
+include(src/module/module.cmake)
 
 include(src/dll/dll.cmake)
 set(LIB_DLL dll)
-make_dll(${LIB_DLL} SHARED)
+make_dll(${LIB_DLL} STATIC)
 
 ## If BUILD_TEST is defined, generate the tests and exit
 if(DEFINED BUILD_TEST)
@@ -126,8 +120,6 @@ find_package(Threads)
 
 ## And linking binaries with libaries
 target_link_libraries(${APP_NAME}
-    ${LIB_TOTO}
-    ${LIB_TATA}
     ${LIB_DLL}
     ${CMAKE_THREAD_LIBS_INIT}
 )

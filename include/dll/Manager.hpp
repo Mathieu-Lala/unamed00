@@ -15,7 +15,7 @@
 
 namespace dll {
 
-class API_EXPORT Manager {
+class DECLSPEC Manager {
 public:
     Manager();
     ~Manager() = default;
@@ -35,6 +35,8 @@ public:
     std::vector<HandlerInfo> list() const;
 
     std::vector<std::string> getAvailable() const;
+
+    const std::shared_ptr<Handler> &get(const std::string &) const;
 
 protected:
 private:

@@ -75,3 +75,8 @@ std::vector<std::string> dll::Manager::getAvailable() const
 
     return out;
 }
+
+const std::shared_ptr<dll::Handler> &dll::Manager::get(const std::string &name) const
+{
+    return this->m_handlers.at(name);
+}
