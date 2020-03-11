@@ -29,7 +29,7 @@
 
 # ifndef DECLSPEC
 #  if defined(OS_WINDOWS)
-#   ifdef LIB_TYPE != SHARED
+#   if LIB_TYPE == SHARED
 #    define DECLSPEC __declspec(dllexport)
 #   else
 #    define DECLSPEC

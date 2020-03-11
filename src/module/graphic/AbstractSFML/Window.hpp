@@ -6,12 +6,20 @@
 #ifndef ABSTRACT_SFML_WINDOW_HPP_
 # define ABSTRACT_SFML_WINDOW_HPP_
 
-#include <SFML/Graphics.hpp>
+# include <SFML/Graphics.hpp>
 
-#include "graphic/Event.hpp"
-#include "graphic/IWindow.hpp"
+# include "graphic/Event.hpp"
+# include "graphic/IWindow.hpp"
 
-class WindowSFML : public graphic::IWindow {
+# include "config/api.hpp"
+
+# if defined(OS_WINDOWS)
+#  pragma comment(lib, "sfml-system")
+#  pragma comment(lib, "sfml-window")
+#  pragma comment(lib, "sfml-graphics")
+# endif
+
+class DECLSPEC WindowSFML : public graphic::IWindow {
 public:
     WindowSFML();
     virtual ~WindowSFML() = default;
@@ -29,5 +37,7 @@ private:
     sf::RenderWindow m_window;
 
 };
+
+EXTERN_C DECLSPEC graphic::IWindow* createWindow();
 
 #endif /* !ABSTRACT_SFML_WINDOW_HPP_ */

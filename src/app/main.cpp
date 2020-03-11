@@ -39,15 +39,15 @@ int main()
     const auto getWindow = [&core](
         const std::string &module_name,
         const std::string &symobl_name = "createWindow",
-        const std::string &module_alias = "default_lib_graphic") {
+        const std::string &module_alias = "default_lib_graphic") -> graphic::IWindow * {
 
         graphic::IWindow *(*createWindow)();
         core.getDllManager().load(module_name, module_alias);
         core.getDllManager().get(module_alias)->load(symobl_name, createWindow);
-        return std::unique_ptr<graphic::IWindow>(createWindow());
+        return createWindow();
     };
 
-    auto window = getWindow("module-graphic-sfml");
+    auto window = std::unique_ptr<graphic::IWindow>(getWindow("module_graphic_sfml"));
 
     while (core.isRunning() && window->isRunning()) {
 

@@ -20,7 +20,7 @@ TEST_CASE("Test DLL :: Handler")
 
     dll::Handler handler;
     {
-        dll::Handler tmp(LIB_OUTPUT_DIR "/libmodule-graphic-sfml.so");
+        dll::Handler tmp(LIB_OUTPUT_DIR "/libmodule_graphic_sfml.so");
         REQUIRE(tmp.is_valid());
         handler = std::move(tmp);
     }
@@ -28,7 +28,7 @@ TEST_CASE("Test DLL :: Handler")
     REQUIRE(handler.is_valid());
     handler.close();
     REQUIRE(!handler.is_valid());
-    handler.open(LIB_OUTPUT_DIR "/libmodule-graphic-sfml.so");
+    handler.open(LIB_OUTPUT_DIR "/libmodule_graphic_sfml.so");
     REQUIRE(handler.is_valid());
 
     {
