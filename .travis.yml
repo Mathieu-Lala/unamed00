@@ -5,6 +5,9 @@ branches:
 
 language: cpp
 
+python:
+  - 3.7
+
 dist: xenial
 os: linux
 
@@ -31,7 +34,7 @@ jobs:
     - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
 
     # Install conan
-    - pip3 install --user conan
+    - pip install --user conan
     # Automatic detection of your arch, compiler, etc.
     - conan user
 
