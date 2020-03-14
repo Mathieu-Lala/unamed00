@@ -21,8 +21,8 @@ jobs:
         sources:
         - ubuntu-toolchain-r-test
         packages:
-        - gcc-7
-        - g++-7
+        - gcc-9
+        - g++-9
         - cmake
 
     install:
@@ -40,8 +40,8 @@ jobs:
     - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 
     before_script:
-    - export CC=gcc-7
-    - export CXX=g++-7
+    - export CC=gcc-9
+    - export CXX=g++-9
     - gcc -v && g++ -v && cmake --version
 
     script: ./make.sh
