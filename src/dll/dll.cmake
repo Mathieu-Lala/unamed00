@@ -3,6 +3,7 @@ function(make_dll dll_name build_type)
     set(DLL_SRC
         src/dll/Handler.cpp
         src/dll/Manager.cpp
+        src/dll/Error.cpp
     )
 
     add_library(${dll_name} ${build_type} ${DLL_SRC})

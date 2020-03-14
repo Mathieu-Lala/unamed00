@@ -7,6 +7,7 @@
 # define DLL_HANDLER_HPP_
 
 # include <string>
+# include <stdexcept>
 
 # include "config/api.hpp"
 
@@ -24,7 +25,7 @@ public:
     Handler() noexcept;
     Handler(Handler &&) noexcept;
     Handler &operator=(Handler &&) noexcept;
-    Handler(std::string libpath);
+    explicit Handler(std::string libpath);
 
     Handler(const Handler &) = delete;
     Handler &operator=(const Handler &) = delete;
@@ -33,11 +34,11 @@ public:
 
     bool is_valid() const noexcept;
 
-    bool open(std::string libpath);
-    bool close();
+    void open(std::string libpath);
+    void close();
 
     template<typename T>
-    bool load(const std::string_view symbol_name, T &data) const
+    T load(const std::string_view symbol_name) const
     {
 # if defined(OS_LINUX)
         auto symbol = ::dlsym(this->m_handler, symbol_name.data());
@@ -45,14 +46,20 @@ public:
         auto symbol = ::GetProcAddress(this->m_handler, symbol_name.data());
 # endif
         if (!symbol)
-            return false;
-        else {
-            data = reinterpret_cast<T>(symbol);
-            return true;
-        }
+            throw error{ };
+
+        return reinterpret_cast<T>(symbol);
     }
 
     const std::string &getPath() const noexcept;
+
+    class error : public std::runtime_error {
+    public:
+        explicit error(const std::string &msg = getLastError());
+        virtual ~error() = default;
+
+        static std::string getLastError();
+    };
 
 protected:
 private:

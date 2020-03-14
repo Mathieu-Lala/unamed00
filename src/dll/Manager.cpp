@@ -4,10 +4,12 @@
  */
 
 #include <algorithm>
+#include <iostream>
 #include <filesystem>
 namespace fs = std::filesystem;
 
 #include "config/platform.hpp"
+
 #include "dll/Manager.hpp"
 
 const std::regex dll::Manager::sc_libname_pattern {
@@ -27,38 +29,18 @@ void dll::Manager::clear()
     this->m_handlers.clear();
 }
 
-std::string getLastError()
-{
-#if defined(OS_LINUX)
-    return ::dlerror();
-#elif defined(OS_WINDOWS)
-    const auto id = ::GetLastError();
-    if (!id)
-        return "";
-    LPSTR buffer = nullptr;
-    const auto size = ::FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, id,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        reinterpret_cast<LPSTR>(&buffer), 0, NULL
-    );
-    std::string message(buffer, size);
-    ::LocalFree(buffer);
-    return message;
-#endif
-}
-
 bool dll::Manager::load(const std::string &name, const std::string &alias)
-{
+try {
     if (this->m_handlers.find(alias) != this->m_handlers.end())
         return false;
 
     const auto handler = std::make_shared<dll::Handler>(this->m_path + name_to_path(name));
-    if (!handler->is_valid())
-        return false;
-
     this->m_handlers.insert({ alias, handler });
     return true;
+
+} catch (const Handler::error &error) {
+    std::cerr << error.what() << std::endl;
+    return false;
 }
 
 bool dll::Manager::unload(const std::string &alias)
@@ -97,7 +79,7 @@ std::vector<std::string> dll::Manager::getAvailable() const
     return out;
 }
 
-const std::shared_ptr<dll::Handler> &dll::Manager::get(const std::string &name) const
+std::weak_ptr<dll::Handler> dll::Manager::get(const std::string &name) const
 {
     return this->m_handlers.at(name);
 }

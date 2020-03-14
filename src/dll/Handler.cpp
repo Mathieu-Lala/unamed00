@@ -38,7 +38,7 @@ bool dll::Handler::is_valid() const noexcept
     return this->m_handler != EMPTY;
 }
 
-bool dll::Handler::open(std::string libpath)
+void dll::Handler::open(std::string libpath)
 {
     this->close();
 
@@ -48,20 +48,27 @@ bool dll::Handler::open(std::string libpath)
 # elif defined(OS_WINDOWS)
     this->m_handler = ::LoadLibrary(this->m_libpath.c_str());
 # endif
-    return this->m_handler != EMPTY;
+
+    if (!this->is_valid())
+        throw error{ };
 }
 
-bool dll::Handler::close()
+void dll::Handler::close()
 {
     if (!this->is_valid())
-        return false;
+        return;
+
 # if defined(OS_LINUX)
-    auto res = ::dlclose(this->m_handler);
+    auto ok = !::dlclose(this->m_handler);
 # elif defined(OS_WINDOWS)
-    auto res = !::FreeLibrary(this->m_handler);
+    auto ok = ::FreeLibrary(this->m_handler);
 # endif
+
     this->m_handler = EMPTY;
-    return !res;
+    this->m_libpath = "";
+
+    if (!ok)
+        throw error{ };
 }
 
 const std::string &dll::Handler::getPath() const noexcept

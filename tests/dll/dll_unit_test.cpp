@@ -7,39 +7,50 @@
 #include <catch2/catch.hpp>
 
 #include "dll/Handler.hpp"
-#include "graphic/IWindow.hpp"
 
-TEST_CASE("Test DLL :: Handler")
+TEST_CASE("DLL :: Handler")
 {
-    {
-        dll::Handler invalidHandler("not a valid path");
-        REQUIRE(!invalidHandler.is_valid());
-        REQUIRE(!invalidHandler.close());
-        dll::Handler movedInvalid(std::move(invalidHandler));
+    const std::string valid_dll = LIB_OUTPUT_DIR "libshared_test.so";
+
+    // Default ctor
+    dll::Handler defaultHandler;
+    REQUIRE(!defaultHandler.is_valid());
+
+    // Path ctor : invalid path
+    try {
+        dll::Handler not_a_valid_path("foobar");
+        REQUIRE(false);
+    } catch (const dll::Handler::error &e) {
+        REQUIRE(std::strlen(e.what()));
     }
 
-    dll::Handler handler;
-    {
-        dll::Handler tmp(LIB_OUTPUT_DIR "/libmodule_graphic_sfml.so");
-        REQUIRE(tmp.is_valid());
-        handler = std::move(tmp);
-    }
+    // Path ctor : valid path
+    dll::Handler valid_handler(valid_dll);
+    REQUIRE(valid_handler.is_valid());
 
-    REQUIRE(handler.is_valid());
-    handler.close();
-    REQUIRE(!handler.is_valid());
-    handler.open(LIB_OUTPUT_DIR "/libmodule_graphic_sfml.so");
-    REQUIRE(handler.is_valid());
+    // move ctor
+    auto moved { std::move(valid_handler) };
 
-    {
-        using type = char *;
-        type data;
-        REQUIRE(!handler.load("foobar", data));
-    }
+    REQUIRE(moved.is_valid());
+    REQUIRE(!valid_handler.is_valid());
 
-    {
-        using type = graphic::IWindow *(*)();
-        type data;
-        REQUIRE(handler.load("createWindow", data));
+    // close and reopen
+    moved.close();
+    REQUIRE(!moved.is_valid());
+    REQUIRE(moved.getPath() == "");
+
+    moved.open(valid_dll);
+    REQUIRE(moved.is_valid());
+
+    // path is correclty saved
+    REQUIRE(moved.getPath() == valid_dll);
+
+    // load symbol from file
+    try {
+        moved.load<char *>("toto");
+        REQUIRE(false);
+    } catch (const dll::Handler::error &e) {
+        REQUIRE(std::strlen(e.what()));
     }
+    REQUIRE(moved.load<const char *(*)()>("entry_point") != nullptr);
 }

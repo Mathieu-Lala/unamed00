@@ -45,6 +45,7 @@ The documentation is generated with the Release build. It contains :
 
 * [Conan](https://conan.io/) - The package and dependencies manager
 * [CMake](https://cmake.org/) - Cross-platform Building Tool
+* [Travis](https://travis-ci.org/) - Continuous integration service for github project
 * [Ctest](https://cmake.org/cmake/help/latest/manual/ctest.1.html) - CMake test driver program
 * [Catch2](https://github.com/catchorg/Catch2) - Testing Framework
 * [Gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) - Code coverage generator

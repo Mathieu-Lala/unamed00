@@ -36,7 +36,7 @@ public:
 
     std::vector<std::string> getAvailable() const;
 
-    const std::shared_ptr<Handler> &get(const std::string &) const;
+    std::weak_ptr<Handler> get(const std::string &) const;
 
 protected:
 private:
