@@ -38,8 +38,9 @@ jobs:
     - pip install --user conan
     # Automatic detection of your arch, compiler, etc.
     - conan user
-    - conan profile new /home/travis/.conan/profiles/default --detect --force
+    - conan profile new ~/.conan/profiles/default --detect --force
     - conan profile update settings.compiler.libcxx=libstdc++11 default
+    - conan profile update settings.compiler.version=9
     - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 
     before_script:
@@ -49,9 +50,8 @@ jobs:
 
     script:
     # Check if the application build successfully
-    - ./make.sh
-    # Build and run the test
-    - ./make.sh Test
+    # And Build and run the test
+    - ./make.sh && ./make.sh Test
 
     after_success:
       - bash <(curl -s https://codecov.io/bash)
