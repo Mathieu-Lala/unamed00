@@ -1,7 +1,6 @@
 #!/bin/bash
 
 clean () {
-    echo "Cleaning"
     rm -f bin/*
     rm -f lib/*
     rm -rf build

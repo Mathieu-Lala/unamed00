@@ -1,2 +1,12 @@
 os: linux
 language: cpp
+
+branches:
+  only:
+  - master
+
+jobs:
+  include:
+    - os: linux
+      compiler: gcc
+      script: ./make.sh
