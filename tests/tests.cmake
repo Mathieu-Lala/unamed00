@@ -12,7 +12,7 @@ append_coverage_compiler_flags()
 include(tests/dll/dll_unit_test.cmake)
 set(DLL_TEST dll_ut)
 make_test_dll(${DLL_TEST})
-target_link_libraries(${DLL_TEST} ${LIB_DLL} ${LIB_TATA} Catch2::Catch2)
+target_link_libraries(${DLL_TEST} ${LIB_DLL} Catch2::Catch2)
 
 ## Using Ctest to generate the coverage
 

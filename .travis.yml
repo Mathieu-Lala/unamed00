@@ -44,4 +44,8 @@ jobs:
     - export CXX=g++-9
     - gcc -v && g++ -v && cmake --version
 
-    script: ./make.sh
+    script:
+    # Check if the application build successfully
+    - ./make.sh
+    # Build and run the test
+    - ./make.sh Test

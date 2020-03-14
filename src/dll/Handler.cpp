@@ -40,6 +40,8 @@ bool dll::Handler::is_valid() const noexcept
 
 bool dll::Handler::open(std::string libpath)
 {
+    this->close();
+
     this->m_libpath = std::move(libpath);
 # if defined(OS_LINUX)
     this->m_handler = ::dlopen(this->m_libpath.c_str(), RTLD_LAZY);
@@ -51,7 +53,7 @@ bool dll::Handler::open(std::string libpath)
 
 bool dll::Handler::close()
 {
-    if (!this->m_handler)
+    if (!this->is_valid())
         return false;
 # if defined(OS_LINUX)
     auto res = ::dlclose(this->m_handler);
