@@ -8,13 +8,18 @@ clean () {
 
 build () {
     clean
-    mkdir -p build ; cd build ; cmake .. -DCMAKE_BUILD_TYPE=$1 $2 && cmake --build . -j4 ; cd ..
+    mkdir -p build ; cd build
+    cmake .. -DCMAKE_BUILD_TYPE=$1 $2 && cmake --build . -j4
+    res=$?
+    if [ $res -ne 0 ]; then
+        exit $res
+    fi
+    cd ..
 }
 
 case $1 in
 
     "Test")
-        echo "Building test"
         build Debug -DBUILD_TEST=True
         make -C build coverage
         ;;
