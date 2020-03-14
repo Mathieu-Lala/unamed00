@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/Mathieu-Lala/unamed00.svg?branch=master)](https://travis-ci.com/Mathieu-Lala/unamed00)
+[![codecov](https://codecov.io/gh/Mathieu-Lala/unamed00/branch/master/graph/badge.svg)](https://codecov.io/gh/Mathieu-Lala/unamed00)
+
 # unamed00
 
 ## Getting Started
