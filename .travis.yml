@@ -24,6 +24,7 @@ jobs:
         - gcc-9
         - g++-9
         - cmake
+        - gcovr
 
     install:
     # Install version 3.16 cmake
