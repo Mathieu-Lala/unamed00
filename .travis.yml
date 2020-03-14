@@ -1,26 +1,28 @@
-dist: trusty
-sudo: required
-
 branches:
   only:
   - master
   - feat/*
 
 language: cpp
-compiler: gcc
 
-addons:
-  apt:
-    sources:
-      - ubuntu-toolchain-r-test
-    packages:
-      - gcc-9
-      - g++-9
-      - cmake
+jobs:
+  include:
+  - os: linux
+    dist: xenial
+    sudo: required
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        packages:
+        - gcc-9
+        - g++-9
+        - cmake
 
-before_script:
-- export CC=gcc-9
-- export CXX=g++-9
-- gcc -v && g++ -v && cmake --version
+    before_install:
+    - export CC=gcc-9
+    - export CXX=g++-9
+    - gcc -v && g++ -v && cmake --version
 
-script: ./make.sh
+    script: ./make.sh
