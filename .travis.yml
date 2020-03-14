@@ -40,7 +40,7 @@ jobs:
     - conan user
     - conan profile new ~/.conan/profiles/default --detect --force
     - conan profile update settings.compiler.libcxx=libstdc++11 default
-    - conan profile update settings.compiler.version=9
+    - conan profile update settings.compiler.version=9 default
     - conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 
     before_script:

@@ -12,7 +12,7 @@ This project was generated from [this template](https://github.com/Mathieu-Lala/
 This project is build with the package manager Conan.
 Make sure you have [installed conan](https://docs.conan.io/en/latest/installation.html) and configured your profile and your remotes.
 
-### Installing
+### Building
 
 Building on unix platform :
 
@@ -44,7 +44,7 @@ The documentation is generated with the Release build. It contains :
 * a list of all the sources files and the all the macro / function / class / namespace ...
 * a todo / bug / issues list
 
-## Built With
+## Made With
 
 * [Conan](https://conan.io/) - The package and dependencies manager
 * [CMake](https://cmake.org/) - Cross-platform Building Tool
