@@ -31,7 +31,7 @@ jobs:
     - export PATH=${DEPS_DIR}/cmake/bin:${PATH}
 
     # Install conan
-    - pip install conan
+    - pip3 install --user conan
     # Automatic detection of your arch, compiler, etc.
     - conan user
 
