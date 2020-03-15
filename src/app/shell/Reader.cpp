@@ -35,6 +35,11 @@ shell::Reader::Reader(IParser &parser) :
     this->reset();
 }
 
+shell::Reader::~Reader()
+{
+    this->kill();
+}
+
 bool shell::Reader::read()
 {
     if (this->m_future.wait_for(std::chrono::microseconds(0)) != std::future_status::ready)

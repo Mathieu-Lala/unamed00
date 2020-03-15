@@ -6,6 +6,8 @@
 #ifndef EVENT_HPP_
 # define EVENT_HPP_
 
+# include "graphic/Key.hpp"
+
 namespace graphic {
 
 struct Event {
@@ -16,15 +18,24 @@ struct Event {
 
         CLOSED,
 
+        KEY_PRESSED,
+        KEY_RELEASED,
+
         TYPE_COUNT,
 
     };
 
     Type type;
 
-//    union
-//    {
-//    };
+    struct KeyEvent
+    {
+        KeyBoard::Key code;
+    };
+
+    union
+    {
+        KeyEvent key;
+    };
 
 };
 

@@ -17,7 +17,7 @@ namespace shell {
 class Reader {
 public:
     Reader(IParser &);
-    ~Reader() = default;
+    ~Reader();
 
     bool read();
 

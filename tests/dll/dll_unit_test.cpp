@@ -28,29 +28,35 @@ TEST_CASE("DLL :: Handler")
     dll::Handler valid_handler(valid_dll);
     REQUIRE(valid_handler.is_valid());
 
-    // move ctor
-    auto moved { std::move(valid_handler) };
+    dll::Handler handler;
 
-    REQUIRE(moved.is_valid());
-    REQUIRE(!valid_handler.is_valid());
+    {
+        // move ctor
+        auto moved { std::move(valid_handler) };
 
-    // close and reopen
-    moved.close();
-    REQUIRE(!moved.is_valid());
-    REQUIRE(moved.getPath() == "");
+        REQUIRE(moved.is_valid());
+        REQUIRE(!valid_handler.is_valid());
 
-    moved.open(valid_dll);
-    REQUIRE(moved.is_valid());
+        // close and reopen
+        moved.close();
+        REQUIRE(!moved.is_valid());
+        REQUIRE(moved.getPath() == "");
+
+        moved.open(valid_dll);
+        REQUIRE(moved.is_valid());
+
+        handler = std::move(moved);
+    }
 
     // path is correclty saved
-    REQUIRE(moved.getPath() == valid_dll);
+    REQUIRE(handler.getPath() == valid_dll);
 
     // load symbol from file
     try {
-        moved.load<char *>("toto");
+        handler.load<char *>("toto");
         REQUIRE(false);
     } catch (const dll::Handler::error &e) {
         REQUIRE(std::strlen(e.what()));
     }
-    REQUIRE(moved.load<const char *(*)()>("entry_point") != nullptr);
+    REQUIRE(handler.load<const char *(*)()>("entry_point") != nullptr);
 }

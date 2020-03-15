@@ -51,7 +51,7 @@ jobs:
     script:
     # Check if the application build successfully
     # And Build and run the test
-    - ./make.sh && ./make.sh Test
+    - ./make.sh Release && ./make.sh Test
 
     after_success:
       - bash <(curl -s https://codecov.io/bash)

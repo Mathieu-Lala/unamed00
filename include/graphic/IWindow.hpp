@@ -6,9 +6,9 @@
 #ifndef IWINDOW_HPP_
 # define IWINDOW_HPP_
 
-namespace graphic {
+# include "graphic/Event.hpp"
 
-struct Event;
+namespace graphic {
 
 class IWindow {
 public:
@@ -22,6 +22,8 @@ public:
     virtual void clear(unsigned int) = 0;
 
     virtual bool pollEvent(Event &e) = 0;
+
+    virtual bool takeScreenShot(const std::string &filepath) = 0;
 
 protected:
 };

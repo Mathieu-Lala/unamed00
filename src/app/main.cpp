@@ -5,6 +5,7 @@
  */
 
 #include <iostream>
+#include <iomanip>
 
 #include "config/macro.hpp"
 
@@ -17,12 +18,20 @@
 
 void init()
 {
+    using namespace std::chrono;
+
+    static const auto start_application = system_clock::now();
+
     std::set_terminate([] {
         std::cout << "Program terminated" << std::endl;
         std::exit(APP_SUCCESS);
     });
 
-    std::atexit([] { std::cout << "Application exited" << std::endl; });
+    std::atexit([] {
+        const auto delay = duration_cast<milliseconds>(system_clock::now() - start_application).count();
+        std::cout << "Application exited after: " << std::fixed << std::setprecision(3) <<
+            (static_cast<double>(delay) / 1000.0f) << " seconds" << std::endl;
+    });
 }
 
 /**
@@ -33,37 +42,6 @@ int main()
     init();
 
     Core core;
-    shell::Parser parser(core);
-    shell::Reader terminal(parser);
 
-    const auto getWindow = [&core](
-        const std::string &module_name,
-        const std::string &symbol_name = "createWindow",
-        const std::string &module_alias = "default_lib_graphic") -> graphic::IWindow * {
-
-        core.getDllManager().load(module_name, module_alias);
-        return core.getDllManager().get(module_alias).lock()->load<graphic::IWindow *(*)()>(symbol_name)();
-
-    };
-
-    auto window = std::unique_ptr<graphic::IWindow>(getWindow("module_graphic_sfml"));
-
-    while (core.isRunning() && window->isRunning()) {
-
-        terminal.read();
-
-        window->clear(0x00);
-        // draw here
-        window->render();
-
-        graphic::Event e;
-        window->pollEvent(e);
-        if (e.type == graphic::Event::CLOSED)
-            window->close();
-
-    }
-
-    terminal.kill();
-
-    return APP_SUCCESS;
+    return core.start();
 }

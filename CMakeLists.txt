@@ -45,6 +45,7 @@ set(ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(INCLUDE_DIR    ${ROOT_DIR}/include)
 set(BIN_OUTPUT_DIR ${ROOT_DIR}/bin)
 set(LIB_OUTPUT_DIR ${ROOT_DIR}/lib)
+set(MEDIA_DIR      ${ROOT_DIR}/media)
 
 ## CMake configuration to cxx header
 

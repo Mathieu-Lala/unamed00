@@ -32,6 +32,8 @@ public:
 
     bool pollEvent(graphic::Event &out) final;
 
+    bool takeScreenShot(const std::string &filepath) final;
+
 private:
 
     sf::RenderWindow m_window;
