@@ -33,7 +33,8 @@ TEST_CASE("DLL :: Manager")
     REQUIRE(manager.load(valid_lib, "valid_lib"));
     REQUIRE(!manager.load(valid_lib, "valid_lib"));
 
-    REQUIRE(manager.list()[0].alias == "valid_lib");
+    const auto [alias, _] = manager.list()[0];
+    REQUIRE(alias == "valid_lib");
 
     manager.clear();
     REQUIRE(!manager.list().size());

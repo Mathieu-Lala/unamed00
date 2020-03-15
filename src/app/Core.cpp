@@ -11,10 +11,12 @@ Core::Core() :
     m_shellParser   (*this),
     m_shellReader   (this->m_shellParser)
 {
-    const std::string module_name = "module_graphic_sfml";
-    const std::string module_alias = "lib#00";
+    const auto module_alias = "lib#00";
+    const auto module_name = "abstract_sfml";
+    const auto real_path = std::string(dll::Manager::DEFAULT_PATH) +
+        "/module/graphic/" + dll::Manager::set_extension(module_name);
 
-    this->m_dllManager.load(module_name, module_alias);
+    this->m_dllManager.loadDirect(real_path, module_alias);
     const auto f = this->m_dllManager.get(module_alias).lock()->load<graphic::IWindow *(*)()>("createWindow");
     this->m_window = std::unique_ptr<graphic::IWindow>(f());
 

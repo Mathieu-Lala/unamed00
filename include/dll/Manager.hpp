@@ -21,31 +21,25 @@ public:
     ~Manager() = default;
 
     void setPath(const std::string &path) { m_path = path; }
+    const std::string &getPath() const { return m_path; }
 
     void clear();
 
-    bool load(const std::string &name, const std::string &alias);
-    bool unload(const std::string &alias);
+    using Alias = std::string; // user given name of an handler
+    using Path = std::string; // real system path
+    using Name = std::string; // name of the libary without extension
 
-    struct HandlerInfo {
-        std::string alias;
-        std::string path;
-    };
+    bool load(const Name &, const Alias &);
+    bool loadDirect(const Path &, const Alias &);
+    bool unload(const Alias &);
 
-    std::vector<HandlerInfo> list() const;
+    std::vector<std::pair<Alias, Path>> list() const;
+    std::vector<Name> getAvailable() const;
 
-    std::vector<std::string> getAvailable() const;
-
-    std::weak_ptr<Handler> get(const std::string &) const;
+    std::weak_ptr<Handler> get(const Alias &) const;
 
     static std::string set_extension(const std::string &name);
-
-protected:
-private:
-
-    std::string m_path;
-
-    std::unordered_map<std::string, std::shared_ptr<Handler>> m_handlers;
+    static std::string remove_extension(const std::string &path);
 
 # if defined(OS_LINUX)
     static constexpr auto DEFAULT_PATH = LIB_OUTPUT_DIR;
@@ -58,6 +52,13 @@ private:
     static constexpr auto LIBNAME_PATTERN_TAIL = ".dll";
 
 # endif
+
+protected:
+private:
+
+    std::string m_path;
+
+    std::unordered_map<Alias, std::shared_ptr<Handler>> m_handlers;
 
     static const std::regex sc_libname_pattern;
 

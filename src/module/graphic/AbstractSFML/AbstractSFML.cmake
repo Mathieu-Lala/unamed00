@@ -24,4 +24,10 @@ function(make_module_sfml module_name build_type)
         ${CONAN_LIBS_SFML}
     )
 
+    set_target_properties(${module_name} PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${LIB_OUTPUT_DIR}/module/graphic/"
+        LIBRARY_OUTPUT_DIRECTORY "${LIB_OUTPUT_DIR}/module/graphic/"
+        RUNTIME_OUTPUT_DIRECTORY "${BIN_OUTPUT_DIR}/module/graphic/"
+    )
+
 endfunction()

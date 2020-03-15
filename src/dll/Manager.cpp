@@ -15,26 +15,33 @@ namespace fs = std::filesystem;
 const std::regex dll::Manager::sc_libname_pattern {
     std::string(LIBNAME_PATTERN_HEAD) + "[A-Za-z0-9_-]+" + LIBNAME_PATTERN_TAIL };
 
-dll::Manager::Manager() :
-    m_path  (DEFAULT_PATH)
-{ }
-
 std::string dll::Manager::set_extension(const std::string &name)
 {
     return LIBNAME_PATTERN_HEAD + name + LIBNAME_PATTERN_TAIL;
 }
+
+std::string dll::Manager::remove_extension(const std::string &path)
+{
+    const auto offset_head = std::strlen(LIBNAME_PATTERN_HEAD);
+    const auto offset_tail = std::strlen(LIBNAME_PATTERN_TAIL);
+    return path.substr(offset_head, path.size() - offset_head - offset_tail);
+}
+
+dll::Manager::Manager() :
+    m_path  (DEFAULT_PATH)
+{ }
 
 void dll::Manager::clear()
 {
     this->m_handlers.clear();
 }
 
-bool dll::Manager::load(const std::string &name, const std::string &alias)
+bool dll::Manager::loadDirect(const Path &path, const Alias &alias)
 try {
     if (this->m_handlers.find(alias) != this->m_handlers.end())
         return false;
 
-    const auto handler = std::make_shared<dll::Handler>(this->m_path + set_extension(name));
+    const auto handler = std::make_shared<dll::Handler>(path);
     this->m_handlers.insert({ alias, handler });
     return true;
 
@@ -43,14 +50,19 @@ try {
     return false;
 }
 
-bool dll::Manager::unload(const std::string &alias)
+bool dll::Manager::load(const Name &name, const Alias &alias)
+{
+    return this->loadDirect(this->m_path + set_extension(name), alias);
+}
+
+bool dll::Manager::unload(const Alias &alias)
 {
     return !!this->m_handlers.erase(alias);
 }
 
-std::vector<dll::Manager::HandlerInfo> dll::Manager::list() const
+std::vector<std::pair<dll::Manager::Alias, dll::Manager::Path>> dll::Manager::list() const
 {
-    std::vector<HandlerInfo> out(this->m_handlers.size());
+    decltype(list()) out(this->m_handlers.size());
     std::size_t i = 0;
     for (const auto &[alias, handler] : this->m_handlers)
         out[i++] = { alias, handler->getPath() };
@@ -59,7 +71,7 @@ std::vector<dll::Manager::HandlerInfo> dll::Manager::list() const
 
 std::vector<std::string> dll::Manager::getAvailable() const
 {
-    std::vector<std::string> out;
+    decltype(getAvailable()) out;
 
     for (auto p = fs::directory_iterator(this->m_path); p != fs::end(p); p++) {
         if (p->is_directory()) continue;
@@ -68,18 +80,14 @@ std::vector<std::string> dll::Manager::getAvailable() const
             [&p](const auto &i) { return i.second->getPath() == p->path(); }))
             continue;
 
-        if (std::regex_match(p->path().filename().string(), sc_libname_pattern)) {
-            const auto &str = p->path().filename().string();
-            out.push_back(str.substr(
-                std::strlen(LIBNAME_PATTERN_HEAD),
-                str.size() - std::strlen(LIBNAME_PATTERN_HEAD) - std::strlen(LIBNAME_PATTERN_TAIL)));
-        }
+        if (std::regex_match(p->path().filename().string(), sc_libname_pattern))
+            out.push_back(remove_extension( p->path().filename().string()));
     }
 
     return out;
 }
 
-std::weak_ptr<dll::Handler> dll::Manager::get(const std::string &name) const
+std::weak_ptr<dll::Handler> dll::Manager::get(const Alias &alias) const
 {
-    return this->m_handlers.at(name);
+    return this->m_handlers.at(alias);
 }
