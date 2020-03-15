@@ -1,8 +1,8 @@
 #!/bin/bash
 
 clean () {
-    rm -f bin/*
-    rm -f lib/*
+    rm -rf bin/*
+    rm -rf lib/*
     rm -rf build
 }
 

@@ -38,10 +38,10 @@ public:
 
     std::weak_ptr<Handler> get(const std::string &) const;
 
+    static std::string set_extension(const std::string &name);
+
 protected:
 private:
-
-    static std::string name_to_path(const std::string &name);
 
     std::string m_path;
 

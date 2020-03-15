@@ -64,7 +64,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIR})
 set(PROJECT_CONAN_BUILD_DIR ${ROOT_DIR}/build/conan)
 ## Use the ext/conan.cmake to call conan within the CMakeLists.txt
 
-set(EXT_CONAN_CMAKE ${ROOT_DIR}/ext/conan.cmake)
+set(EXT_CONAN_CMAKE ${ROOT_DIR}/ext/cmake/conan.cmake)
 include(${EXT_CONAN_CMAKE})
 conan_cmake_install(BUILD missing CONANFILE conanfile.txt INSTALL_FOLDER ${PROJECT_CONAN_BUILD_DIR})
 

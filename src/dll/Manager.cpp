@@ -1,5 +1,5 @@
 /**
- * @file src/app/dll/Manager.cpp
+ * @file src/dll/Manager.cpp
  *
  */
 
@@ -19,7 +19,7 @@ dll::Manager::Manager() :
     m_path  (DEFAULT_PATH)
 { }
 
-std::string dll::Manager::name_to_path(const std::string &name)
+std::string dll::Manager::set_extension(const std::string &name)
 {
     return LIBNAME_PATTERN_HEAD + name + LIBNAME_PATTERN_TAIL;
 }
@@ -34,7 +34,7 @@ try {
     if (this->m_handlers.find(alias) != this->m_handlers.end())
         return false;
 
-    const auto handler = std::make_shared<dll::Handler>(this->m_path + name_to_path(name));
+    const auto handler = std::make_shared<dll::Handler>(this->m_path + set_extension(name));
     this->m_handlers.insert({ alias, handler });
     return true;
 

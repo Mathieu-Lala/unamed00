@@ -70,3 +70,15 @@ bool WindowSFML::takeScreenShot(const std::string &filepath)
     const sf::Image img = screen.copyToImage();
     return img.saveToFile(filepath);
 }
+
+bool WindowSFML::setFavicon(const std::string &filepath)
+{
+    if (!this->m_favicon.loadFromFile(filepath))
+        return false;
+
+    this->m_window.setIcon(
+        this->m_favicon.getSize().x, this->m_favicon.getSize().y,
+        this->m_favicon.getPixelsPtr());
+
+    return true;
+}

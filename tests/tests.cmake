@@ -2,7 +2,7 @@
 
 find_package(Catch2 REQUIRED)
 
-set(EXT_CODE_COVERAGE_CMAKE ${ROOT_DIR}/ext/CodeCoverage.cmake)
+set(EXT_CODE_COVERAGE_CMAKE ${ROOT_DIR}/ext/cmake/CodeCoverage.cmake)
 include(${EXT_CODE_COVERAGE_CMAKE})
 
 append_coverage_compiler_flags()
@@ -25,6 +25,6 @@ setup_target_for_coverage_gcovr_html(
     NAME coverage
     EXECUTABLE ctest -j4
     BASE_DIRECTORY ${ROOT_DIR}/src
-    EXCLUDE tests
+    ##EXCLUDE tests
     DEPENDENCIES ${DLL_TEST}
 )

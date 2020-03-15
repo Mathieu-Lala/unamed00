@@ -27,6 +27,8 @@ public:
     bool isRunning() final;
     void close() final;
 
+    bool setFavicon(const std::string &filepath) final;
+
     void render() final;
     void clear(unsigned int color) final;
 
@@ -37,6 +39,8 @@ public:
 private:
 
     sf::RenderWindow m_window;
+
+    sf::Image m_favicon;
 
 };
 

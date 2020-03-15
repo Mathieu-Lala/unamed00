@@ -1,5 +1,5 @@
 /**
- * @file include/graphic/IWindow.hpp
+ * @file include/graphic/Event.hpp
  *
  */
 

@@ -1,5 +1,5 @@
 /**
- * @file tests/dll/dll_unit_test.cpp
+ * @file tests/dll/HandlerUnitTest.cpp
  *
  */
 
@@ -7,10 +7,11 @@
 #include <catch2/catch.hpp>
 
 #include "dll/Handler.hpp"
+#include "dll/Manager.hpp"
 
 TEST_CASE("DLL :: Handler")
 {
-    const std::string valid_dll = LIB_OUTPUT_DIR "libshared_test.so";
+    const auto valid_dll = std::string(LIB_OUTPUT_DIR "tests/") + dll::Manager::set_extension("shared_test");
 
     // Default ctor
     dll::Handler defaultHandler;
@@ -19,7 +20,6 @@ TEST_CASE("DLL :: Handler")
     // Path ctor : invalid path
     try {
         dll::Handler not_a_valid_path("foobar");
-        REQUIRE(false);
     } catch (const dll::Handler::error &e) {
         REQUIRE(std::strlen(e.what()));
     }
@@ -54,7 +54,6 @@ TEST_CASE("DLL :: Handler")
     // load symbol from file
     try {
         handler.load<char *>("toto");
-        REQUIRE(false);
     } catch (const dll::Handler::error &e) {
         REQUIRE(std::strlen(e.what()));
     }

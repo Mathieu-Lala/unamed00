@@ -4,6 +4,7 @@
  */
 
 #include "app/Core.hpp"
+#include "utils/utils.hpp"
 
 Core::Core() :
     m_is_running    (true),
@@ -16,18 +17,8 @@ Core::Core() :
     this->m_dllManager.load(module_name, module_alias);
     const auto f = this->m_dllManager.get(module_alias).lock()->load<graphic::IWindow *(*)()>("createWindow");
     this->m_window = std::unique_ptr<graphic::IWindow>(f());
-}
 
-static std::string timeStampToString()
-{
-    char buffer[32];
-    auto now = std::time(nullptr);
-    const auto tp = std::localtime(&now);
-
-    if (!std::strftime(buffer, sizeof(buffer), "%Y-%m-%d_%H-%M-%S", tp))
-        return "1970-01-01_00:00:00";
-
-    return buffer;
+    this->m_window->setFavicon(MEDIA_DIR "logo/favicon.jpg");
 }
 
 int Core::start()

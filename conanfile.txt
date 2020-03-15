@@ -8,6 +8,10 @@ sfml/2.5.1@bincrafters/stable
 cmake
 
 [options]
-    sfml:graphics=True
-    sfml:window=True
-    sfml:shared=True
+sfml:graphics=True
+sfml:window=True
+sfml:shared=True
+
+[imports]
+bin, *.dll -> ./bin
+lib, *.dylib* -> ./bin
