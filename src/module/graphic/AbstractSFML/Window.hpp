@@ -8,7 +8,6 @@
 
 # include <SFML/Graphics.hpp>
 
-# include "graphic/Event.hpp"
 # include "graphic/IWindow.hpp"
 
 # include "config/api.hpp"

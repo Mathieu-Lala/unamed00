@@ -39,4 +39,12 @@
 #  endif
 # endif
 
+# if defined(OS_LINUX)
+#  define ON_OPEN __attribute__((constructor))
+#  define ON_CLOSE __attribute__((destructor))
+# else
+#  define ON_OPEN
+#  define ON_CLOSE
+# endif
+
 #endif /* !CONFIG_API_HPP_ */

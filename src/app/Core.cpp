@@ -3,6 +3,8 @@
  *
  */
 
+#include <iostream>
+
 #include "app/Core.hpp"
 #include "utils/utils.hpp"
 
@@ -11,8 +13,12 @@ Core::Core() :
     m_shellParser   (*this),
     m_shellReader   (this->m_shellParser)
 {
-    for (const auto &i : m_dllManager.getAvailable())
-        this->m_dllManager.load(i.name, i.moduleType);
+    try {
+        for (const auto &i : m_dllManager.getAvailable())
+            this->m_dllManager.load(i.name, i.moduleType);
+    } catch (const dll::Handler::error &error) {
+        std::cerr << error.what() << std::endl;
+    }
 
     for (const auto &i : m_dllManager.list())
         if (const auto info = m_dllManager.info(i); info.moduleType == "graphic") {
@@ -34,7 +40,9 @@ int Core::start()
             this->m_window->render();
 
             graphic::Event e;
+            e.type = graphic::Event::NONE;
             this->m_window->pollEvent(e);
+
             if (e.type == graphic::Event::CLOSED)
                 this->m_window->close();
             if (e.type == graphic::Event::KEY_PRESSED)

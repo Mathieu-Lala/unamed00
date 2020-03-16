@@ -38,10 +38,21 @@ void init()
  * @brief entry point of the application
  */
 int main()
+try
 {
     init();
 
     Core core;
 
     return core.start();
+}
+catch (const std::exception &e)
+{
+    std::cerr << "Caught exception at main level: " << e.what() << std::endl;
+    return APP_ERROR;
+}
+catch (...)
+{
+    std::cerr << "Program terminated with active throw" << std::endl;
+    throw;
 }

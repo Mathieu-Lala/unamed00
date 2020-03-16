@@ -6,6 +6,8 @@
 #ifndef IWINDOW_HPP_
 # define IWINDOW_HPP_
 
+# include <string>
+
 # include "graphic/Event.hpp"
 
 namespace graphic {

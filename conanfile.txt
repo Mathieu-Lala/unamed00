@@ -7,8 +7,8 @@ glfw/3.2.1@bincrafters/stable
 
 [generators]
 cmake
-cmake_find_package
-cmake_paths
+#cmake_find_package
+#cmake_paths
 
 [options]
 sfml:graphics=True

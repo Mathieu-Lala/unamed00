@@ -44,8 +44,6 @@ void WindowSFML::clear(unsigned int color)
 
 bool WindowSFML::pollEvent(graphic::Event &out)
 {
-    out.type = graphic::Event::NONE;
-
     sf::Event e;
     while (this->m_window.pollEvent(e)) {
         if (e.type == sf::Event::Closed)
