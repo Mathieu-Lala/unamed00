@@ -22,7 +22,7 @@ dll::Handler &dll::Handler::operator=(dll::Handler &&o) noexcept
     return *this;
 }
 
-dll::Handler::Handler(std::string libpath) :
+dll::Handler::Handler(Path libpath) :
     m_handler   (EMPTY)
 {
     this->open(std::move(libpath));
@@ -38,7 +38,7 @@ bool dll::Handler::is_valid() const noexcept
     return this->m_handler != EMPTY;
 }
 
-void dll::Handler::open(std::string libpath)
+void dll::Handler::open(Path libpath)
 {
     this->close();
 
@@ -71,7 +71,7 @@ void dll::Handler::close()
         throw error{ };
 }
 
-const std::string &dll::Handler::getPath() const noexcept
+const dll::Handler::Path &dll::Handler::getPath() const noexcept
 {
     return this->m_libpath;
 }

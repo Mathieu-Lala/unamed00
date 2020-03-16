@@ -3,14 +3,16 @@ doxygen_installer/1.8.15@bincrafters/stable
 Catch2/2.11.1@catchorg/stable
 
 sfml/2.5.1@bincrafters/stable
+glfw/3.2.1@bincrafters/stable
 
 [generators]
 cmake
+cmake_find_package
+cmake_paths
 
 [options]
 sfml:graphics=True
 sfml:window=True
-sfml:shared=True
 
 [imports]
 bin, *.dll -> ./bin

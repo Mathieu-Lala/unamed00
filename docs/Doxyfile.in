@@ -4,7 +4,7 @@
 PROJECT_NAME        = "@PROJECT_NAME@"
 PROJECT_NUMBER      = @PROJECT_VERSION@
 PROJECT_BRIEF       = "@PROJECT_DESCRIPTION@"
-PROJECT_LOGO        = @ROOT_DIR@/media/logo/ISO_C++_Logo_small.svg.png
+PROJECT_LOGO        = @ROOT_DIR@/resources/icon/ISO_C++_Logo_small.svg.png
 
 OUTPUT_DIRECTORY    = @ROOT_DIR@/build/doc_doxygen/
 

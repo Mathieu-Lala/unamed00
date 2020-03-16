@@ -41,6 +41,8 @@ private:
     void load(const std::vector<std::string> &);
     void unload(const std::vector<std::string> &);
 
+    void set(const std::vector<std::string> &);
+
 };
 
 } // namespace shell

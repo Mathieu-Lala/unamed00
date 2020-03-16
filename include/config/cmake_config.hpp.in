@@ -22,6 +22,6 @@
 
 # define BIN_OUTPUT_DIR "@BIN_OUTPUT_DIR@/" /*!< @brief Folder containing binaries */
 # define LIB_OUTPUT_DIR "@LIB_OUTPUT_DIR@/" /*!< @brief Folder containing libaries */
-# define MEDIA_DIR "@MEDIA_DIR@/" /*!< @brief Folder containing media resources */
+# define RESOURCE_DIR "@RESOURCE_DIR@/" /*!< @brief Folder containing media resources */
 
 #endif /* !CMAKE_CONFIG_HPP_ */

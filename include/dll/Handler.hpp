@@ -22,10 +22,13 @@ namespace dll {
 
 class DECLSPEC Handler {
 public:
+
+    using Path = std::string;
+
     Handler() noexcept;
     Handler(Handler &&) noexcept;
     Handler &operator=(Handler &&) noexcept;
-    explicit Handler(std::string libpath);
+    explicit Handler(Path libpath);
 
     Handler(const Handler &) = delete;
     Handler &operator=(const Handler &) = delete;
@@ -34,7 +37,7 @@ public:
 
     bool is_valid() const noexcept;
 
-    void open(std::string libpath);
+    void open(Path libpath);
     void close();
 
     template<typename T>
@@ -51,7 +54,8 @@ public:
         return reinterpret_cast<T>(symbol);
     }
 
-    const std::string &getPath() const noexcept;
+
+    const Path &getPath() const noexcept;
 
     class error : public std::runtime_error {
     public:
@@ -73,7 +77,7 @@ private:
 # endif
 
     raw_t m_handler;
-    std::string m_libpath;
+    Path m_libpath;
 
 };
 

@@ -27,6 +27,8 @@ public:
 
     int start();
 
+    bool setWindowFromModule(const dll::Manager::UID &);
+
 protected:
 private:
 

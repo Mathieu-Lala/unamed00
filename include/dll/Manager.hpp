@@ -25,21 +25,37 @@ public:
 
     void clear();
 
-    using Alias = std::string; // user given name of an handler
-    using Path = std::string; // real system path
+    using UID = uint16_t;
     using Name = std::string; // name of the libary without extension
 
-    bool load(const Name &, const Alias &);
-    bool loadDirect(const Path &, const Alias &);
-    bool unload(const Alias &);
+    UID load(const Name &, const std::string & = "<none>");
+    UID loadDirect(const Handler::Path &);
+    bool unload(const UID &);
 
-    std::vector<std::pair<Alias, Path>> list() const;
-    std::vector<Name> getAvailable() const;
+    struct Info {
+        Info(Name n, std::string module = "<none>", UID id = 0) :
+            name        (std::move(n)),
+            moduleType  (std::move(module)),
+            uid         (id)
+        { }
+        Name name;
+        std::string moduleType;
+        UID uid;
+//        Handler::Path path;
+    };
 
-    std::weak_ptr<Handler> get(const Alias &) const;
+    std::vector<UID> list() const;
+    Info info(const UID &);
+
+    std::vector<Info> getAvailable() const;
+
+    std::weak_ptr<Handler> get(const UID &) const;
 
     static std::string set_extension(const std::string &name);
     static std::string remove_extension(const std::string &path);
+
+protected:
+private:
 
 # if defined(OS_LINUX)
     static constexpr auto DEFAULT_PATH = LIB_OUTPUT_DIR;
@@ -53,12 +69,11 @@ public:
 
 # endif
 
-protected:
-private:
+    static UID s_currentUID;
 
     std::string m_path;
 
-    std::unordered_map<Alias, std::shared_ptr<Handler>> m_handlers;
+    std::unordered_map<UID, std::shared_ptr<Handler>> m_handlers;
 
     static const std::regex sc_libname_pattern;
 

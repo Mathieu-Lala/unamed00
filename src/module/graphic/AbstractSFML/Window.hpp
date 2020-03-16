@@ -44,6 +44,6 @@ private:
 
 };
 
-EXTERN_C DECLSPEC graphic::IWindow* createWindow();
+EXTERN_C DECLSPEC graphic::IWindow *createWindow();
 
 #endif /* !ABSTRACT_SFML_WINDOW_HPP_ */

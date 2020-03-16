@@ -17,24 +17,28 @@ TEST_CASE("DLL :: Manager")
 
     REQUIRE(!manager.list().size());
 
-    REQUIRE(manager.getAvailable() == std::vector<std::string>{ valid_lib });
+    const auto available = manager.getAvailable();
+    REQUIRE((available.size() == 1 && available[0].name == valid_lib));
 
-    REQUIRE(!manager.load("foo", "bar"));
+    try {
+        manager.load("foo", "bar");
+    } catch (...) {
+        REQUIRE(true);
+    }
 
-    REQUIRE(manager.load(valid_lib, "valid_lib"));
+    auto id = manager.load(valid_lib);
 
-    auto ptr = manager.get("valid_lib");
+    auto ptr = manager.get(id);
     REQUIRE(!!ptr.lock());
 
-    REQUIRE(manager.unload("valid_lib"));
+    REQUIRE(manager.unload(id));
 
     REQUIRE(!ptr.lock());
 
-    REQUIRE(manager.load(valid_lib, "valid_lib"));
-    REQUIRE(!manager.load(valid_lib, "valid_lib"));
+    auto new_id = manager.load(valid_lib);
+    REQUIRE(manager.load(valid_lib) == new_id);
 
-    const auto [alias, _] = manager.list()[0];
-    REQUIRE(alias == "valid_lib");
+    REQUIRE(manager.list()[0] == new_id);
 
     manager.clear();
     REQUIRE(!manager.list().size());

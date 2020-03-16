@@ -4,22 +4,11 @@
  */
 
 #include <iostream>
-#include <sstream>
 
 #include "app/shell/Parser.hpp"
 #include "app/Core.hpp"
 
-static std::vector<std::string> explode(const std::string &str, char delim)
-{
-    std::istringstream split(str);
-    std::vector<std::string> tokens;
-
-    std::string each;
-    while (std::getline(split, each, delim))
-        if (each.size())
-            tokens.push_back(each);
-    return tokens;
-}
+#include "utils/utils.hpp"
 
 shell::Parser::Parser(Core &core) :
     m_core  (core)
@@ -34,6 +23,8 @@ shell::Parser::Parser(Core &core) :
     m_mapCallback["unload"] = &Parser::unload;
 
     m_mapCallback["list"] = &Parser::list;
+
+    m_mapCallback["set"] = &Parser::set;
 
     // ...
 }
@@ -58,21 +49,23 @@ static constexpr unsigned int str2int(const char *str, int h = 0)
 
 void shell::Parser::help(const std::string &command)
 {
-    std::cout << "Command '" << command << "'" << std::endl;
+    std::cout << "Command '" << command << "': ";
     switch (str2int(command.data())) {
         case str2int("help"):
             std::cout <<
                 "Print the help message for the researched commands or all." << std::endl <<
                 "Usage: help [command...]" << std::endl <<
-                "\tcommand:\tthe commands you want the help for" << std::endl <<
+                "\tcommand:\toptionals commands you want the help for" << std::endl <<
             std::endl;
             break;
+
         case str2int("version"):
             std::cout <<
                 "Print the version of the application." << std::endl <<
                 "Usage: version" << std::endl <<
             std::endl;
             break;
+
         case str2int("quit"):
         case str2int("exit"):
             std::cout <<
@@ -80,28 +73,41 @@ void shell::Parser::help(const std::string &command)
                 "Usage: exit|quit" << std::endl <<
             std::endl;
             break;
+
         case str2int("list"):
             std::cout <<
-                "List the data of the program depending on data_type." << std::endl <<
-                "Usage: list data_type" << std::endl <<
-                "\tdata_type:\t(loaded|available)" << std::endl <<
+                "List the data of the program." << std::endl <<
+                "Usage: list data" << std::endl <<
+                "\tdata:\t(all|loaded|available)" << std::endl <<
             std::endl;
             break;
+
         case str2int("load"):
             std::cout <<
                 "Load the dynamic libary into the program." << std::endl <<
-                "Usage: load alias lib_name" << std::endl <<
-                "\talias:\tuser given name of the libary" << std::endl <<
+                "Usage: load lib_name [module]" << std::endl <<
                 "\tlib_name:\tname of the target libary" << std::endl <<
+                "\tmodule:\toptional module type of the libary" << std::endl <<
             std::endl;
             break;
+
         case str2int("unload"):
             std::cout <<
                 "Unload the previously loaded dynamic libary." << std::endl <<
-                "Usage: unload alias" << std::endl <<
-                "\talias:\tuser given name of the libary" << std::endl <<
+                "Usage: unload id" << std::endl <<
+                "\tid:\tid of the libary" << std::endl <<
             std::endl;
             break;
+
+        case str2int("set"):
+            std::cout <<
+                "Set a specific data of the core." << std::endl <<
+                "Usage: set name value" << std::endl <<
+                "\tname:\tname of the data" << std::endl <<
+                "\tvalue:\tnew value of name" << std::endl <<
+            std::endl;
+            break;
+
         default:
             std::cout << "No help message for '" << command << "'" << std::endl << std::endl;
             break;
@@ -133,18 +139,31 @@ void shell::Parser::list(const std::vector<std::string> &command)
         return this->help("list");
     }
 
-    if (command[1] == "loaded") {
-        std::cout << "List of loaded libaries:" << std::endl;
-        for (const auto &[alias, path] : this->m_core.getDllManager().list())
-            std::cout << "- " << alias << " at: " << path << std::endl;
-        std::cout << "End" << std::endl;
+    switch (str2int(command[1].data())) {
+        case str2int("all"):
+            this->list({"", "loaded"});
+            this->list({"", "available"});
+            break;
 
-    } else if (command[1] == "available") {
-        std::cout << "List of availables libaries:" << std::endl;
-        for (const auto &i : this->m_core.getDllManager().getAvailable())
-            std::cout << "- " << i << std::endl;
-        std::cout << "End" << std::endl;
+        case str2int("loaded"):
+            std::cout << "List of loaded libaries:" << std::endl;
+            for (const auto &uid : this->m_core.getDllManager().list()) {
+                const auto info = this->m_core.getDllManager().info(uid);
+                std::cout << "- " << info.moduleType << " / " << info.name << " id:" << info.uid << std::endl;
+            }
+            std::cout << "End" << std::endl;
+            break;
 
+        case str2int("available"):
+            std::cout << "List of availables libaries:" << std::endl;
+            for (const auto &i : this->m_core.getDllManager().getAvailable())
+                std::cout << "- " << i.moduleType << " / " << i.name << std::endl;
+            std::cout << "End" << std::endl;
+            break;
+
+        default:
+            std::cout << "Command list: invalid argument" << std::endl;
+            return this->help("list");
     }
 }
 
@@ -155,10 +174,16 @@ void shell::Parser::load(const std::vector<std::string> &command)
         return help("load");
     }
 
-    if (this->m_core.getDllManager().load(command[2], command[1]))
-        std::cout << "Alias '" << command[1] << "' of libary '" << command[2] << "' loaded" << std::endl;
-    else
-        std::cout << "No such libary: '" + command[2] << "' or alias '" << command[1] << "' already used" << std::endl;
+    try {
+        const auto uid = this->m_core.getDllManager().load(command[1], command.size() == 3 ? command[2] : "<none>");
+        std::cout << "Libary '" << command[1] << "' loaded with id: '" << uid << "'" << std::endl;
+
+    } catch (const dll::Handler::error &) {
+        std::cout << "Could not load libary '" << command[1] << "'";
+        if (command.size() == 3)
+            std::cout << " in module '" << command[2] << "'";
+        std::cout << std::endl;
+    }
 }
 
 void shell::Parser::unload(const std::vector<std::string> &command)
@@ -168,10 +193,15 @@ void shell::Parser::unload(const std::vector<std::string> &command)
         return help("unload");
     }
 
-    if (this->m_core.getDllManager().unload(command[1]))
-        std::cout << "Alias '" << command[1] << "' unloaded" << std::endl;
-    else
-        std::cout << "No such alias: " + command[1] << std::endl;
+    try {
+        const auto uid = static_cast<dll::Manager::UID>(std::stoi(command[1]));
+        if (this->m_core.getDllManager().unload(uid)) {
+            std::cout << "Alias '" << command[1] << "' unloaded" << std::endl;
+            return;
+        }
+
+    } catch (...) { }
+    std::cout << "No such id: " + command[1] << std::endl;
 }
 
 void shell::Parser::version(const std::vector<std::string> &)
@@ -181,4 +211,19 @@ void shell::Parser::version(const std::vector<std::string> &)
         "Build type: " PROJECT_BUILD_TYPE_AS_STRING ", on platform: " OS_AS_STRING << std::endl <<
         "Copyright (c) 2020 Mathieu Lala" << std::endl <<
         "This is free software; see the source for copying conditions." << std::endl;
+}
+
+void shell::Parser::set(const std::vector<std::string> &command)
+{
+    if (command.size() != 3) {
+        std::cout << "Command set: invalid argument" << std::endl;
+        return help("set");
+    }
+
+    if (command[1] == "window") {
+        try {
+            const auto uid = static_cast<dll::Manager::UID>(std::stoi(command[2]));
+            this->m_core.setWindowFromModule(uid);
+        } catch (...) { }
+    }
 }

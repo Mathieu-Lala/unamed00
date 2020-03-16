@@ -11,16 +11,14 @@ Core::Core() :
     m_shellParser   (*this),
     m_shellReader   (this->m_shellParser)
 {
-    const auto module_alias = "lib#00";
-    const auto module_name = "abstract_sfml";
-    const auto real_path = std::string(dll::Manager::DEFAULT_PATH) +
-        "/module/graphic/" + dll::Manager::set_extension(module_name);
+    for (const auto &i : m_dllManager.getAvailable())
+        this->m_dllManager.load(i.name, i.moduleType);
 
-    this->m_dllManager.loadDirect(real_path, module_alias);
-    const auto f = this->m_dllManager.get(module_alias).lock()->load<graphic::IWindow *(*)()>("createWindow");
-    this->m_window = std::unique_ptr<graphic::IWindow>(f());
-
-    this->m_window->setFavicon(MEDIA_DIR "logo/favicon.jpg");
+    for (const auto &i : m_dllManager.list())
+        if (const auto info = m_dllManager.info(i); info.moduleType == "graphic") {
+            this->setWindowFromModule(info.uid);
+            break;
+        }
 }
 
 int Core::start()
@@ -42,13 +40,30 @@ int Core::start()
             if (e.type == graphic::Event::KEY_PRESSED)
                 if (e.key.code == graphic::KeyBoard::F12)
                     this->m_window->takeScreenShot(
-                        std::string(MEDIA_DIR) + "screenshots/" + timeStampToString() + ".png");
+                        std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png");
 
         }
 
     }
 
     return APP_SUCCESS;
+}
+
+bool Core::setWindowFromModule(const dll::Manager::UID &id)
+{
+    if (auto module = this->m_dllManager.get(id).lock(); !module)
+        return false;
+    else {
+        const auto f = module->load<graphic::IWindow *(*)()>("createWindow");
+        if (!f) return false;
+
+        this->m_window = std::unique_ptr<graphic::IWindow>(f());
+        if (!this->m_window) return false;
+
+        this->m_window->setFavicon(RESOURCE_DIR "icon/favicon.jpg");
+
+        return true;
+    }
 }
 
 void Core::stop() noexcept
