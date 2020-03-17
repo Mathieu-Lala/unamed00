@@ -66,7 +66,12 @@ set(PROJECT_CONAN_BUILD_DIR ${ROOT_DIR}/build/conan)
 
 set(EXT_CONAN_CMAKE ${ROOT_DIR}/ext/cmake/conan.cmake)
 include(${EXT_CONAN_CMAKE})
-conan_cmake_install(BUILD missing CONANFILE conanfile.txt INSTALL_FOLDER ${PROJECT_CONAN_BUILD_DIR})
+conan_cmake_install(
+    BUILD missing
+    CONANFILE conanfile.txt
+    INSTALL_FOLDER ${PROJECT_CONAN_BUILD_DIR}
+    INSTALL_ARGS -s build_type=${CMAKE_BUILD_TYPE}
+)
 
 ## Build the dependencies
 

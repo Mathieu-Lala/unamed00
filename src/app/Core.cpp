@@ -14,17 +14,18 @@ Core::Core() :
     m_shellReader   (this->m_shellParser)
 {
     try {
-        for (const auto &i : m_dllManager.getAvailable())
-            this->m_dllManager.load(i.name, i.moduleType);
+        for (const auto &i : m_dllManager.getAvailable()) 
+            if (i.moduleType != "<none>")
+                this->m_dllManager.load(i.name, i.moduleType);
     } catch (const dll::Handler::error &error) {
         std::cerr << error.what() << std::endl;
     }
 
-    for (const auto &i : m_dllManager.list())
-        if (const auto info = m_dllManager.info(i); info.moduleType == "graphic") {
-            this->setWindowFromModule(info.uid);
-            break;
-        }
+    const auto &loaded = m_dllManager.list();
+    const auto lib_graphic = std::find_if(loaded.begin(), loaded.end(),
+        [this](const auto &uid) { return this->m_dllManager.info(uid).moduleType == "graphic"; });
+    if (lib_graphic != loaded.end())
+        this->setWindowFromModule(*lib_graphic);
 }
 
 int Core::start()

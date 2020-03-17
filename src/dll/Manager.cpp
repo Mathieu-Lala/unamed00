@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <functional>
 #include <filesystem>
 namespace fs = std::filesystem;
 
@@ -64,7 +65,7 @@ std::vector<dll::Manager::UID> dll::Manager::list() const
 {
     decltype(list()) out(this->m_handlers.size());
     std::size_t i = 0;
-    for (const auto &[uid, _] : this->m_handlers)
+    for (const auto& [uid, _] : this->m_handlers) 
         out[i++] = uid;
     return out;
 }
@@ -84,7 +85,7 @@ std::vector<dll::Manager::Info> dll::Manager::getAvailable() const
 
             // if it is a valid libary file and not already loaded
             } else if (!std::any_of(this->m_handlers.begin(), this->m_handlers.end(),
-                [&p](const auto &i){ return i.second->getPath() == p->path().string(); }) &&
+                [&p](const auto &i){ return i.second->getPath() == p->path().generic_string(); }) &&
                 std::regex_match(p->path().filename().string(), sc_libname_pattern))
 
                 out.emplace_back(

@@ -24,4 +24,12 @@
 # define LIB_OUTPUT_DIR "@LIB_OUTPUT_DIR@/" /*!< @brief Folder containing libaries */
 # define RESOURCE_DIR "@RESOURCE_DIR@/" /*!< @brief Folder containing media resources */
 
+/*
+# if PROJECT_BUILD_TYPE == Debug
+#  define _ITERATOR_DEBUG_LEVEL 2 // enabled (for debug builds)
+# else
+#  define _ITERATOR_DEBUG_LEVEL 0 // disabled (for release builds)
+# endif
+*/
+
 #endif /* !CMAKE_CONFIG_HPP_ */
