@@ -68,7 +68,9 @@ bool Core::setWindowFromModule(const dll::Manager::UID &id)
         this->m_window = std::unique_ptr<graphic::IWindow>(f());
         if (!this->m_window) return false;
 
-        this->m_window->setFavicon(RESOURCE_DIR "icon/favicon.jpg");
+        this->m_window->setFavicon(RESOURCE_DIR "icon/favicon.png");
+        this->m_window->setSize(1080, 760);
+        this->m_window->setTitle(this->m_window->getName() + " - RenderWindow - " PROJECT_NAME "\\v" PROJECT_VERSION);
 
         return true;
     }

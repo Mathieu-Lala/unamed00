@@ -16,6 +16,7 @@ function(make_module_glfw module_name build_type)
 
     target_link_libraries(${module_name}
         ${CONAN_LIBS_GLFW}
+        ${CONAN_LIBS_STB}
     )
 
     target_include_directories(${module_name} PRIVATE ext)

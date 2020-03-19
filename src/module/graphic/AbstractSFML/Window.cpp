@@ -8,18 +8,12 @@
 
 WindowSFML::WindowSFML()
 {
-    sf::ContextSettings ctx;
+    this->m_window.create(sf::VideoMode(1080, 720), "");
+}
 
-# if PROJECT_BUILD_TYPE == Debug
-    ctx.attributeFlags = sf::ContextSettings::Debug;
-# endif
-
-    this->m_window.create(
-        sf::VideoMode(1080, 720),
-        "SFML - RenderWindow",
-        sf::Style::Default,
-        ctx);
-
+std::string WindowSFML::getName()
+{
+    return "SFML";
 }
 
 bool WindowSFML::isRunning()
@@ -30,6 +24,30 @@ bool WindowSFML::isRunning()
 void WindowSFML::close()
 {
     this->m_window.close();
+}
+
+void WindowSFML::setTitle(const std::string &title)
+{
+    this->m_window.setTitle(title);
+}
+
+void WindowSFML::setSize(unsigned int x, unsigned int y)
+{
+    this->m_window.setSize(sf::Vector2u(x, y));
+}
+
+bool WindowSFML::setFavicon(const std::string &filepath)
+{
+    sf::Image img;
+
+    if (!img.loadFromFile(filepath))
+        return false;
+
+    this->m_window.setIcon(
+        img.getSize().x, img.getSize().y,
+        img.getPixelsPtr());
+
+    return true;
 }
 
 void WindowSFML::render()
@@ -67,16 +85,4 @@ bool WindowSFML::takeScreenShot(const std::string &filepath)
     screen.update(this->m_window);
     const sf::Image img = screen.copyToImage();
     return img.saveToFile(filepath);
-}
-
-bool WindowSFML::setFavicon(const std::string &filepath)
-{
-    if (!this->m_favicon.loadFromFile(filepath))
-        return false;
-
-    this->m_window.setIcon(
-        this->m_favicon.getSize().x, this->m_favicon.getSize().y,
-        this->m_favicon.getPixelsPtr());
-
-    return true;
 }

@@ -23,9 +23,13 @@ public:
     WindowSFML();
     virtual ~WindowSFML() = default;
 
+    std::string getName() final;
+
     bool isRunning() final;
     void close() final;
 
+    void setTitle(const std::string &) final;
+    void setSize(unsigned int x, unsigned int y) final;
     bool setFavicon(const std::string &filepath) final;
 
     void render() final;
@@ -38,8 +42,6 @@ public:
 private:
 
     sf::RenderWindow m_window;
-
-    sf::Image m_favicon;
 
 };
 

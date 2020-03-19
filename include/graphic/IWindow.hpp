@@ -17,9 +17,13 @@ public:
 
     virtual ~IWindow() = default;
 
+    virtual std::string getName() = 0;
+
     virtual bool isRunning() = 0;
     virtual void close() = 0;
 
+    virtual void setTitle(const std::string &) = 0;
+    virtual void setSize(unsigned int x, unsigned int y) = 0;
     virtual bool setFavicon(const std::string &filepath) = 0;
 
     virtual void render() = 0;

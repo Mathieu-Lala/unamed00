@@ -8,5 +8,6 @@ add auto-versionning
 add leak-checker
 
 add msvc coverage (gcov) / continuous integration
+fix coverage issue (codecov)
 
 setup github action for continuous integration

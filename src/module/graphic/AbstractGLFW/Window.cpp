@@ -5,13 +5,21 @@
 
 #include <stdexcept>
 
+#include "utils/warning.hpp"
+
+DISABLE_WARNING_PUSH
+DISABLE_WARN_UNUSED
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+DISABLE_WARNING_POP
+
 #include "Window.hpp"
 
 WindowGLFW::WindowGLFW()
 {
-    const float SCR_WIDTH = 1080;
-    const float SCR_HEIGHT = 760;
-    this->m_window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "GLFW - RenderWindow", nullptr, nullptr);
+    this->m_window = glfwCreateWindow(1080, 760, "", nullptr, nullptr);
 
     glfwMakeContextCurrent(this->m_window);
 
@@ -26,6 +34,11 @@ WindowGLFW::~WindowGLFW()
     glfwDestroyWindow(this->m_window);
 }
 
+std::string WindowGLFW::getName()
+{
+    return "GLFW";
+}
+
 bool WindowGLFW::isRunning()
 {
     return !glfwWindowShouldClose(this->m_window);
@@ -36,9 +49,30 @@ void WindowGLFW::close()
     glfwSetWindowShouldClose(this->m_window, true);
 }
 
-bool WindowGLFW::setFavicon(const std::string &)
+void WindowGLFW::setTitle(const std::string &title)
 {
-    return false;
+    glfwSetWindowTitle(this->m_window, title.data());
+}
+
+void WindowGLFW::setSize(unsigned int x, unsigned int y)
+{
+    glfwSetWindowSize(this->m_window, x, y);
+}
+
+// FIXME
+bool WindowGLFW::setFavicon(const std::string &/*filepath*/)
+{
+//    stbi_set_flip_vertically_on_load(true);
+//
+//    int width; int height; int channels;
+//    auto pixels = stbi_load(filepath.data(), &width, &height, &channels, STBI_default);
+//    if (!pixels)
+//        return false;
+//
+//    GLFWimage icons = { .width = width, .height = height, .pixels = pixels };
+//    glfwSetWindowIcon(this->m_window, 1, &icons);
+//    stbi_image_free(pixels);
+    return true;
 }
 
 void WindowGLFW::render()
