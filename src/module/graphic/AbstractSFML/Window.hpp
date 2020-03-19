@@ -13,9 +13,21 @@
 # include "config/api.hpp"
 
 # if defined(OS_WINDOWS)
-#  pragma comment(lib, "sfml-system")
-#  pragma comment(lib, "sfml-window")
-#  pragma comment(lib, "sfml-graphics")
+#  if PROJECT_BUILD_TYPE == Debug
+#   pragma comment(lib,"sfml-graphics-s-d.lib")
+//#   pragma comment(lib,"sfml-audio-s-d.lib")
+//#   pragma comment(lib,"sfml-network-s-d.lib")
+#   pragma comment(lib,"sfml-window-s-d.lib")
+#   pragma comment(lib,"sfml-system-s-d.lib")
+#   pragma comment(lib,"sfml-main-d.lib")
+#  else
+#   pragma comment(lib,"sfml-graphics-s.lib")
+//#   pragma comment(lib,"sfml-audio-s.lib")
+//#   pragma comment(lib,"sfml-network-s.lib")
+#   pragma comment(lib,"sfml-window-s.lib")
+#   pragma comment(lib,"sfml-system-s.lib")
+#   pragma comment(lib,"sfml-main.lib")
+#  endif
 # endif
 
 class DECLSPEC WindowSFML : public graphic::IWindow {

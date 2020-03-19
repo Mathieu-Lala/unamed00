@@ -11,14 +11,14 @@ function(make_module_sfml module_name build_type)
         PRIVATE LIB_TYPE=${build_type}
     )
 
-    if(MSVC)
-        foreach(file_i sfml-graphics-2.dll sfml-window-2.dll sfml-system-2.dll)
-            add_custom_command(TARGET ${module_name} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} ARGS -E copy
-                    "${CONAN_BIN_DIRS_SFML}/${file_i}" "${BIN_OUTPUT_DIR}/${file_i}"
-        )
-        endforeach(file_i)
-    endif()
+##    if(MSVC)
+##        foreach(file_i sfml-graphics-2.dll sfml-window-2.dll sfml-system-2.dll)
+##            add_custom_command(TARGET ${module_name} POST_BUILD
+##                COMMAND ${CMAKE_COMMAND} ARGS -E copy
+##                    "${CONAN_BIN_DIRS_SFML}/${file_i}" "${BIN_OUTPUT_DIR}/${file_i}"
+##        )
+##        endforeach(file_i)
+##    endif()
 
     target_link_libraries(${module_name}
         ${CONAN_LIBS_SFML}
@@ -29,5 +29,12 @@ function(make_module_sfml module_name build_type)
         LIBRARY_OUTPUT_DIRECTORY "${LIB_OUTPUT_DIR}/module/graphic/"
         RUNTIME_OUTPUT_DIRECTORY "${BIN_OUTPUT_DIR}/module/graphic/"
     )
+
+##    foreach(lib_sfml ${CONAN_LIBS_SFML})
+##        add_custom_command(TARGET ${module_name} PRE_BUILD
+##            COMMAND ${CMAKE_COMMAND} ARGS -E copy
+##                "${LIB_OUTPUT_DIR}/${lib_sfml}.lib" "${LIB_OUTPUT_DIR}/module/graphic/${lib_sfml}.lib"
+##        )
+##    endforeach(lib_sfml)
 
 endfunction()

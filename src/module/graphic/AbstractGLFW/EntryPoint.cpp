@@ -3,6 +3,7 @@
  *
  */
 
+#define SET_ENTRY_POINT
 #include "config/api.hpp"
 
 #include "Window.hpp"
@@ -12,7 +13,7 @@ EXTERN_C DECLSPEC graphic::IWindow *createWindow()
     return new WindowGLFW;
 }
 
-EXTERN_C void ON_OPEN constructor()
+void ATTACH_NAME()
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -22,9 +23,10 @@ EXTERN_C void ON_OPEN constructor()
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+
 }
 
-EXTERN_C void ON_CLOSE destructor()
+void DETACH_NAME()
 {
     glfwTerminate();
 }
