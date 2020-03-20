@@ -11,10 +11,11 @@
 Core::Core() :
     m_is_running    (true),
     m_shellParser   (*this),
-    m_shellReader   (this->m_shellParser)
+    m_shellReader   (this->m_shellParser),
+    m_window        (nullptr, nullptr)
 {
     try {
-        for (const auto &i : m_dllManager.getAvailable()) 
+        for (const auto &i : m_dllManager.getAvailable())
             if (i.moduleType != "<none>")
                 this->m_dllManager.load(i.name, i.moduleType);
     } catch (const dll::Handler::error &error) {
@@ -63,15 +64,24 @@ bool Core::setWindowFromModule(const dll::Manager::UID &id)
     if (auto module = this->m_dllManager.get(id).lock(); !module)
         return false;
     else {
-        const auto f = module->load<graphic::IWindow *(*)()>("createWindow");
-        if (!f) return false;
+        const auto ctor = module->load<graphic::IWindow::Ctor>("createWindow");
+        const auto dtor = module->load<graphic::IWindow::Dtor>("destroyWindow");
+        if (!ctor || !dtor) return false;
 
-        this->m_window = std::unique_ptr<graphic::IWindow>(f());
+        this->m_window = WindowPtr(ctor(), dtor);
         if (!this->m_window) return false;
+
+        if (!this->m_window->init()) {
+            std::cerr << "Failed to initialize the window" << std::endl;
+            return false;
+        }
+
+        const auto name_f = module->load<std::string(*)()>("getName");
+        const auto title = (name_f ? name_f() : "Unknown") + " - RenderWindow - " PROJECT_NAME "\\v" PROJECT_VERSION;
+        this->m_window->setTitle(title);
 
         this->m_window->setFavicon(RESOURCE_DIR "icon/favicon.png");
         this->m_window->setSize(1080, 760);
-        this->m_window->setTitle(this->m_window->getName() + " - RenderWindow - " PROJECT_NAME "\\v" PROJECT_VERSION);
 
         return true;
     }

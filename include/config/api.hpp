@@ -39,10 +39,13 @@
 #  endif
 # endif
 
-# if LIB_TYPE == SHARED && defined(SET_ENTRY_POINT)
+# define ATTACH_NAME constructor
+# define DETACH_NAME destructor
 
-#  define ATTACH_NAME constructor
-#  define DETACH_NAME destructor
+# define ON_ATTACH void ATTACH_NAME()
+# define ON_DETACH void DETACH_NAME()
+
+# if LIB_TYPE == SHARED && defined(SET_ENTRY_POINT)
 
 #  if defined(OS_LINUX)
 #   define ATTACH_DEC EXTERN_C void __attribute__((constructor)) ATTACH_NAME();
@@ -55,8 +58,8 @@
 ATTACH_DEC;
 DETACH_DEC;
 
-# define DEFAULT_ATTACH void ATTACH_NAME() {}
-# define DEFAULT_DETACH void DETACH_NAME() {}
+# define DEFAULT_ATTACH ON_ATTACH {}
+# define DEFAULT_DETACH ON_DETACH {}
 
 # if defined(OS_WINDOWS)
 #  define WIN32_MEAN_AND_LEAN

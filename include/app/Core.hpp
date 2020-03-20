@@ -39,7 +39,9 @@ private:
 
     dll::Manager m_dllManager;
 
-    std::unique_ptr<graphic::IWindow> m_window;
+    using WindowPtr = std::unique_ptr<graphic::IWindow, graphic::IWindow::Dtor>;
+
+    WindowPtr m_window;
 
 };
 

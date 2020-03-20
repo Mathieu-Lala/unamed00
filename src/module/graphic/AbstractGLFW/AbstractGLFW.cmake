@@ -1,17 +1,17 @@
 function(make_module_glfw module_name build_type)
 
     set(MODULE_SRC
-        ext/glad/glad.cpp
         src/module/graphic/AbstractGLFW/Window.cpp
         src/module/graphic/AbstractGLFW/EntryPoint.cpp
+        ext/glad/glad.cpp
     )
 
     add_library(${module_name} ${build_type} ${MODULE_SRC})
 
     target_compile_definitions(${module_name}
         PRIVATE LIB_TYPE=${build_type}
-        PUBLIC GLAD_GLAPI_EXPORT
-        PUBLIC GLAD_GLAPI_EXPORT_BUILD
+        PRIVATE GLAD_GLAPI_EXPORT
+        PRIVATE GLAD_GLAPI_EXPORT_BUILD
     )
 
     target_link_libraries(${module_name}

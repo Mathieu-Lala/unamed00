@@ -15,9 +15,12 @@ namespace graphic {
 class IWindow {
 public:
 
+    using Ctor = IWindow *(*)();
+    using Dtor = void(*)(IWindow *);
+
     virtual ~IWindow() = default;
 
-    virtual std::string getName() = 0;
+    virtual bool init() = 0;
 
     virtual bool isRunning() = 0;
     virtual void close() = 0;

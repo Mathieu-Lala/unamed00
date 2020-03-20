@@ -3,17 +3,25 @@
  *
  */
 
+#include <SFML/OpenGL.hpp>
+
 #include "config/cmake_config.hpp"
 #include "Window.hpp"
 
 WindowSFML::WindowSFML()
 {
-    this->m_window.create(sf::VideoMode(1080, 720), "");
 }
 
-std::string WindowSFML::getName()
+bool WindowSFML::init()
 {
-    return "SFML";
+    sf::ContextSettings ctx;
+    ctx.majorVersion = 4;
+    ctx.minorVersion = 5;
+    ctx.attributeFlags = sf::ContextSettings::Core;
+
+    this->m_window.create(sf::VideoMode(1080, 720), "", sf::Style::Default, ctx);
+
+    return true;
 }
 
 bool WindowSFML::isRunning()
@@ -57,23 +65,31 @@ void WindowSFML::render()
 
 void WindowSFML::clear(unsigned int color)
 {
-    this->m_window.clear(sf::Color(color));
+    const float r = (color & 0xFF000000) / 255.0f;
+    const float g = (color & 0x00FF0000) / 255.0f;
+    const float b = (color & 0x0000FF00) / 255.0f;
+    const float a = (color & 0x000000FF) / 255.0f;
+    glClearColor(r, g, b, a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    //this->m_window.clear(sf::Color(color));
 }
 
 bool WindowSFML::pollEvent(graphic::Event &out)
 {
     sf::Event e;
-    while (this->m_window.pollEvent(e)) {
-        if (e.type == sf::Event::Closed)
-            out.type = graphic::Event::CLOSED;
-        if (e.type == sf::Event::KeyPressed) {
-            out.type = graphic::Event::KEY_PRESSED;
-            out.key.code = static_cast<graphic::KeyBoard::Key>(e.key.code);
-        }
-        if (e.type == sf::Event::KeyReleased) {
-            out.type = graphic::Event::KEY_RELEASED;
-            out.key.code = static_cast<graphic::KeyBoard::Key>(e.key.code);
-        }
+    if (!this->m_window.pollEvent(e))
+        return false;
+
+    if (e.type == sf::Event::Closed)
+        out.type = graphic::Event::CLOSED;
+    if (e.type == sf::Event::KeyPressed) {
+        out.type = graphic::Event::KEY_PRESSED;
+        out.key.code = static_cast<graphic::KeyBoard::Key>(e.key.code);
+    }
+    if (e.type == sf::Event::KeyReleased) {
+        out.type = graphic::Event::KEY_RELEASED;
+        out.key.code = static_cast<graphic::KeyBoard::Key>(e.key.code);
     }
     return true;
 }

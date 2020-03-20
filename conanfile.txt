@@ -17,6 +17,8 @@ sfml:graphics=True
 sfml:window=True
 
 [imports]
-bin, *.dll -> ./../../bin
+bin, *.dll    -> ./../../bin
 lib, *.dylib* -> ./../../bin
-lib, *.lib -> ./../../lib
+lib, *.lib    -> ./../../lib
+#lib, *.so*    -> ./../../lib & symlinks=True
+.  , license* -> ./../../ext/licenses @ folder=True, ignore_case=True

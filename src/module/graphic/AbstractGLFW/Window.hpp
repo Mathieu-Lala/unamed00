@@ -18,7 +18,7 @@ public:
     WindowGLFW();
     virtual ~WindowGLFW();
 
-    std::string getName() final;
+    bool init() final;
 
     bool isRunning() final;
     void close() final;
@@ -39,7 +39,5 @@ private:
     GLFWwindow *m_window;
 
 };
-
-EXTERN_C DECLSPEC graphic::IWindow *createWindow();
 
 #endif /* !ABSTRACT_GLFW_WINDOW_HPP_ */

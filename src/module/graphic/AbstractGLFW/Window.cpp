@@ -8,35 +8,34 @@
 #include "utils/warning.hpp"
 
 DISABLE_WARNING_PUSH
-DISABLE_WARN_UNUSED
-
+DISABLE_WARN_UNUSED // unused variable in std_image.h
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
 DISABLE_WARNING_POP
 
 #include "Window.hpp"
 
 WindowGLFW::WindowGLFW()
 {
+}
+
+bool WindowGLFW::init()
+{
     this->m_window = glfwCreateWindow(1080, 760, "", nullptr, nullptr);
+    if (!this->m_window)
+        return false;
 
     glfwMakeContextCurrent(this->m_window);
 
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
-        throw std::runtime_error("glad:: initialization failed");
+        return false;
 
-    glEnable(GL_DEPTH_TEST);
+    return true;
 }
 
 WindowGLFW::~WindowGLFW()
 {
     glfwDestroyWindow(this->m_window);
-}
-
-std::string WindowGLFW::getName()
-{
-    return "GLFW";
 }
 
 bool WindowGLFW::isRunning()

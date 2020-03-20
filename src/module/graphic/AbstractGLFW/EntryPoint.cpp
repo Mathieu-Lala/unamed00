@@ -3,6 +3,9 @@
  *
  */
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #define SET_ENTRY_POINT
 #include "config/api.hpp"
 
@@ -13,7 +16,17 @@ EXTERN_C DECLSPEC graphic::IWindow *createWindow()
     return new WindowGLFW;
 }
 
-void ATTACH_NAME()
+EXTERN_C DECLSPEC void destroyWindow(graphic::IWindow *w)
+{
+    delete w;
+}
+
+EXTERN_C DECLSPEC std::string getName()
+{
+    return std::string("GLFW v") + glfwGetVersionString();
+}
+
+ON_ATTACH
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -26,7 +39,7 @@ void ATTACH_NAME()
 
 }
 
-void DETACH_NAME()
+ON_DETACH
 {
     glfwTerminate();
 }

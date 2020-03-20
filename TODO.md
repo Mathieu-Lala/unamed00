@@ -4,6 +4,7 @@ use conanfile.py instead of conanfile.txt
 add test with conan
 
 add auto-versionning
+add changelog
 
 add leak-checker
 
