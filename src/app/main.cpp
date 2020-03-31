@@ -37,8 +37,7 @@ void init()
 /**
  * @brief entry point of the application
  */
-int main()
-try
+int main() try
 {
     init();
 
