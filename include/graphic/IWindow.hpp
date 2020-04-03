@@ -8,7 +8,7 @@
 
 # include <string>
 
-# include "ecs/ECS.hpp"
+# include <ecs/ECS.hpp>
 
 # include "graphic/Event.hpp"
 

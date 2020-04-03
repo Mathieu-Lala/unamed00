@@ -3,26 +3,79 @@
  *
  */
 
+#include <glad/glad.h>
 #include <SFML/OpenGL.hpp>
 
-#include "config/cmake_config.hpp"
-#include "Window.hpp"
+#include <config/cmake_config.hpp>
+#include <data/Component.hpp>
 
-#include "data/Component.hpp"
+#include "Window.hpp"
 
 WindowSFML::WindowSFML()
 {
 }
 
+const char *vertexShaderSource = "#version 330 core\n"
+    "layout (location = 0) in vec3 aPos;\n"
+    "void main()\n"
+    "{\n"
+    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+    "}\0";
+
+const char *fragmentShaderSource = "#version 330 core\n"
+    "out vec4 FragColor;\n"
+    "void main()\n"
+    "{\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+    "}\n\0";
+
+int vertexShader;
+int fragmentShader;
+int shaderProgram;
+
 bool WindowSFML::init()
 {
-    sf::ContextSettings ctx;
-    ctx.majorVersion = 4;
-    ctx.minorVersion = 5;
-    ctx.attributeFlags = sf::ContextSettings::Core;
+    sf::ContextSettings settings;
+    settings.majorVersion = 4;
+    settings.minorVersion = 5;
+    settings.attributeFlags = sf::ContextSettings::Core | sf::ContextSettings::Debug;
 
-    this->m_window.create(sf::VideoMode(1080, 720), "", sf::Style::Default, ctx);
+    this->m_window.create(sf::VideoMode(1080, 720), "", sf::Style::Default, settings);
     this->m_window.setActive(true);
+
+    gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction));
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_TRUE);
+    glClearDepth(1.f);
+
+    glEnable(GL_TEXTURE_2D);
+
+    // Setup a perspective projection
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+
+
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
 
     return true;
 }
@@ -82,19 +135,43 @@ void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
 {
     world->tickSystem<CShape>([this](CShape *shape) {
 
-        auto rect = sf::RectangleShape(sf::Vector2f(
-            shape->w * this->m_window.getSize().x,
-            shape->h * this->m_window.getSize().y)
-        );
-        rect.setPosition(
-            shape->x * this->m_window.getSize().x,
-            shape->y * this->m_window.getSize().y
-        );
-        rect.setFillColor(sf::Color::Red);
+        float vertices[] = {
+            shape->x + shape->w, shape->y + shape->h, 0.0f,
+            shape->x + shape->w, shape->y,            0.0f,
+            shape->x,            shape->y,            0.0f,
+            shape->x,            shape->y + shape->h, 0.0f
+        };
 
-        m_window.pushGLStates();
-        this->m_window.draw(rect);
-        m_window.popGLStates();
+        unsigned int indices[] = {
+            0, 1, 3, // first Triangle
+            1, 2, 3  // second Triangle
+        };
+
+        unsigned int VBO, VAO, EBO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
+
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(VAO);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glDeleteVertexArrays(1, &VAO);
+        glDeleteBuffers(1, &VBO);
+        glDeleteBuffers(1, &EBO);
 
     });
 }

@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 
-#include "utils/warning.hpp"
+#include <utils/warning.hpp>
 
 DISABLE_WARNING_PUSH
 DISABLE_WARN_UNUSED // unused variable in std_image.h
@@ -13,9 +13,9 @@ DISABLE_WARN_UNUSED // unused variable in std_image.h
 #include <stb_image.h>
 DISABLE_WARNING_POP
 
-#include "Window.hpp"
+#include <data/Component.hpp>
 
-#include "data/Component.hpp"
+#include "Window.hpp"
 
 WindowGLFW::WindowGLFW()
 {

@@ -6,7 +6,7 @@
 #ifndef WARNING_HPP_
 # define WARNING_HPP_
 
-# include "config/platform.hpp"
+# include <config/platform.hpp>
 
 # if defined(OS_WINDOWS)
 #  define DISABLE_WARNING_PUSH  __pragma(warning(push))

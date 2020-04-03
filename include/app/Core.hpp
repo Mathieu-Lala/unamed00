@@ -9,11 +9,13 @@
 # include <atomic>
 
 # include <dll/Manager.hpp>
+# include <ecs/ECS.hpp>
+
+# include <graphic/IWindow.hpp>
+# include <scene/IScene.hpp>
 
 # include "app/shell/Parser.hpp"
 # include "app/shell/Reader.hpp"
-
-# include "graphic/IWindow.hpp"
 
 class Core {
 public:
@@ -28,6 +30,7 @@ public:
     int start();
 
     bool setWindowFromModule(const dll::Manager::UID &);
+    bool setSceneFromModule(const dll::Manager::UID &);
 
 protected:
 private:
@@ -39,9 +42,13 @@ private:
 
     dll::Manager m_dllManager;
 
-    using WindowPtr = std::unique_ptr<graphic::IWindow, graphic::IWindow::Dtor>;
+    std::unique_ptr<ecs::World> m_world;
 
+    using WindowPtr = std::unique_ptr<graphic::IWindow, graphic::IWindow::Dtor>;
     WindowPtr m_window;
+
+    using ScenePtr = std::unique_ptr<scene::IScene, scene::IScene::Dtor>;
+    ScenePtr m_scene;
 
 };
 

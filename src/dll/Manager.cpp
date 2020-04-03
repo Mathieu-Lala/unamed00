@@ -9,7 +9,7 @@
 #include <filesystem>
 namespace fs = std::filesystem;
 
-#include "config/platform.hpp"
+#include <config/platform.hpp>
 
 #include "dll/Manager.hpp"
 
@@ -65,7 +65,7 @@ std::vector<dll::Manager::UID> dll::Manager::list() const
 {
     decltype(list()) out(this->m_handlers.size());
     std::size_t i = 0;
-    for (const auto& [uid, _] : this->m_handlers) 
+    for (const auto& [uid, _] : this->m_handlers)
         out[i++] = uid;
     return out;
 }

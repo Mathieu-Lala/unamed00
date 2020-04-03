@@ -7,7 +7,7 @@
 #include <GLFW/glfw3.h>
 
 #define SET_ENTRY_POINT
-#include "config/api.hpp"
+#include <config/api.hpp>
 
 #include "Window.hpp"
 

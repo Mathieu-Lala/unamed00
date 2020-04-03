@@ -9,11 +9,9 @@
 # include <glad/glad.h>
 # include <GLFW/glfw3.h>
 
-# include "graphic/IWindow.hpp"
+# include <graphic/IWindow.hpp>
 
-# include "config/api.hpp"
-
-class DECLSPEC WindowGLFW : public graphic::IWindow {
+class WindowGLFW : public graphic::IWindow {
 public:
     WindowGLFW();
     virtual ~WindowGLFW();

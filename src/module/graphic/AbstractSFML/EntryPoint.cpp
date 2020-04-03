@@ -5,7 +5,7 @@
 
 #include <SFML/Config.hpp>
 
-#include "config/api.hpp"
+#include <config/api.hpp>
 
 # if defined(OS_WINDOWS)
 #  if PROJECT_BUILD_TYPE == Debug

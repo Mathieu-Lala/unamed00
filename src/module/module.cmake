@@ -1,7 +1,8 @@
 include(src/module/graphic/AbstractSFML/AbstractSFML.cmake)
-set(MODULE_SFML "abstract_sfml")
-make_module_sfml(${MODULE_SFML} SHARED)
+make_module_sfml("abstract_sfml" SHARED)
 
 include(src/module/graphic/AbstractGLFW/AbstractGLFW.cmake)
-set(MODULE_GLFW "abstract_glfw")
-make_module_glfw(${MODULE_GLFW} SHARED)
+make_module_glfw("abstract_glfw" SHARED)
+
+include(src/module/scene/Example/Example.cmake)
+make_scene_example("scene_example" SHARED)

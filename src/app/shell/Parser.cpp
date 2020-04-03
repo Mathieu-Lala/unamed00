@@ -5,10 +5,10 @@
 
 #include <iostream>
 
+#include <utils/utils.hpp>
+
 #include "app/shell/Parser.hpp"
 #include "app/Core.hpp"
-
-#include "utils/utils.hpp"
 
 shell::Parser::Parser(Core &core) :
     m_core  (core)
@@ -105,6 +105,8 @@ void shell::Parser::help(const std::string &command)
                 "Usage: set name value" << std::endl <<
                 "\tname:\tname of the data" << std::endl <<
                 "\tvalue:\tnew value of name" << std::endl <<
+                "Available data:" << std::endl <<
+                "\twindow: rendering window of the application" << std::endl <<
             std::endl;
             break;
 
@@ -223,7 +225,10 @@ void shell::Parser::set(const std::vector<std::string> &command)
     if (command[1] == "window") {
         try {
             const auto uid = static_cast<dll::Manager::UID>(std::stoi(command[2]));
-            this->m_core.setWindowFromModule(uid);
-        } catch (...) { }
+            if (!this->m_core.setWindowFromModule(uid))
+                std::cout << "Failed to the window from module: " << command[2] << std::endl;
+        } catch (...) {
+            std::cout << "Invalid argument: " << command[2] << std::endl;
+        }
     }
 }

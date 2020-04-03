@@ -7,14 +7,11 @@
 #include <iostream>
 #include <iomanip>
 
-#include "config/macro.hpp"
+#include <config/macro.hpp>
 
 #include "app/Core.hpp"
 #include "app/shell/Reader.hpp"
 #include "app/shell/Parser.hpp"
-
-#include "graphic/Event.hpp"
-#include "graphic/IWindow.hpp"
 
 void init()
 {
