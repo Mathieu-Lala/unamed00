@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef POOL_HPP_
-# define POOL_HPP_
+#ifndef ECS_INTERNAL_POOL_HPP_
+# define ECS_INTERNAL_POOL_HPP_
 
 # include <bitset>
 # include <cinttypes>
@@ -126,4 +126,4 @@ private:
 
 } // namespace ecs
 
-#endif /* !POOL_HPP_ */
+#endif /* !ECS_INTERNAL_POOL_HPP_ */

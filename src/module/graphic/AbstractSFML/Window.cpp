@@ -8,6 +8,8 @@
 #include "config/cmake_config.hpp"
 #include "Window.hpp"
 
+#include "data/Component.hpp"
+
 WindowSFML::WindowSFML()
 {
 }
@@ -20,6 +22,7 @@ bool WindowSFML::init()
     ctx.attributeFlags = sf::ContextSettings::Core;
 
     this->m_window.create(sf::VideoMode(1080, 720), "", sf::Style::Default, ctx);
+    this->m_window.setActive(true);
 
     return true;
 }
@@ -73,6 +76,27 @@ void WindowSFML::clear(unsigned int color)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //this->m_window.clear(sf::Color(color));
+}
+
+void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
+{
+    world->tickSystem<CShape>([this](CShape *shape) {
+
+        auto rect = sf::RectangleShape(sf::Vector2f(
+            shape->w * this->m_window.getSize().x,
+            shape->h * this->m_window.getSize().y)
+        );
+        rect.setPosition(
+            shape->x * this->m_window.getSize().x,
+            shape->y * this->m_window.getSize().y
+        );
+        rect.setFillColor(sf::Color::Red);
+
+        m_window.pushGLStates();
+        this->m_window.draw(rect);
+        m_window.popGLStates();
+
+    });
 }
 
 bool WindowSFML::pollEvent(graphic::Event &out)

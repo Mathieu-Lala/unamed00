@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef COMPONENT_HPP_
-# define COMPONENT_HPP_
+#ifndef ECS_INTERNAL_COMPONENT_HPP_
+# define ECS_INTERNAL_COMPONENT_HPP_
 
 # include <cassert>
 # include <cinttypes>
@@ -16,7 +16,7 @@ namespace ecs {
 namespace component {
 
 using Mask = std::uint64_t;
-static_assert(std::is_unsigned<Mask>::value, "Mask type must be unsigned");
+static_assert(std::is_unsigned_v<Mask>, "Mask type must be unsigned");
 
 constexpr auto MAX = std::numeric_limits<Mask>::digits;
 
@@ -51,4 +51,4 @@ constexpr Mask getMask() noexcept
 
 } // namespace ecs
 
-#endif /* !COMPONENT_HPP_ */
+#endif /* !ECS_INTERNAL_COMPONENT_HPP_ */

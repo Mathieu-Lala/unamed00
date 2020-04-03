@@ -3,12 +3,14 @@
  *
  */
 
-#ifndef IMPLEMENTATION_HPP_
-# define IMPLEMENTATION_HPP_
+#ifndef ECS_INTERNAL_IMPLEMENTATION_HPP_
+# define ECS_INTERNAL_IMPLEMENTATION_HPP_
+
+#include <iostream>
 
 namespace ecs {
 
-entity::Handler World::createEntity()
+inline entity::Handler World::createEntity()
 {
     entity::ID new_id;
 
@@ -26,32 +28,32 @@ entity::Handler World::createEntity()
         m_entities[new_id] = false;
     }
 
-    return { new_id };
+    return { new_id, *this };
 }
 
-entity::Handler World::getEntityHandle(entity::ID entityID)
+inline entity::Handler World::getEntityHandle(entity::ID entityID)
 {
-    return { entityID };
+    return { entityID, *this };
 }
 
-entity::Handler Iterator::operator*() const
+inline entity::Handler Iterator::operator*() const
 {
-    return World::get()->getEntityHandle(m_index);
+    return this->m_list->m_world.getEntityHandle(m_index);
 }
 
-Iterator &Iterator::operator++()
+inline Iterator &Iterator::operator++()
 {
-    const auto &world = *World::get().get();
-    const auto count = world.getEntityCount();
+    const auto count = this->m_list->m_world.getEntityCount();
 
     auto i = this->m_index + 1;
-    for (; i < count && (!world.isValid(i) || !world.hasComponents(i, m_list->m_mask)); i++);
+    for (; i < count && (!this->m_list->m_world.isValid(i) ||
+        !this->m_list->m_world.hasComponents(i, m_list->m_mask)); i++);
     m_index = i >= count ? MAX_INDEX : i;
     return *this;
 }
 
 template<typename... Components>
-void World::tickSystem(const System<Components...> &f)
+inline void World::tickSystem(const System<Components...> &f)
 {
     this->forEachEntity<Components...>([&f](const entity::Handler &e) {
         f(e.get<Components>()...);
@@ -60,4 +62,4 @@ void World::tickSystem(const System<Components...> &f)
 
 };
 
-#endif /* !IMPLEMENTATION_HPP_ */
+#endif /* !ECS_INTERNAL_IMPLEMENTATION_HPP_ */

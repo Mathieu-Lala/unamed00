@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef WORLD_HPP_
-# define WORLD_HPP_
+#ifndef ECS_INTERNAL_WORLD_HPP_
+# define ECS_INTERNAL_WORLD_HPP_
 
 # include <algorithm>
 # include <functional>
@@ -15,18 +15,9 @@
 namespace ecs {
 
 class World {
-private:
-    struct pv_data { pv_data() = default; };
-
 public:
-    World(pv_data &&) {}
+    World() = default;
     ~World() = default;
-
-    static std::unique_ptr<World> &get()
-    {
-        static auto ptr = std::make_unique<World>(pv_data{ });
-        return ptr;
-    }
 
     entity::Handler createEntity();
     void destroyEntity(entity::ID);
@@ -76,7 +67,8 @@ private:
     component::Pool<ComponentType> *getPool(bool alloc = true);
 
     template<typename... Components>
-    EntityList entitiesWith();
+    EntityList entitiesWith()
+        { return { component::getMask<Components...>(), *this }; }
 
     template<typename... Components>
     void forEachEntity(const std::function<void(const entity::Handler &)> &);
@@ -84,7 +76,7 @@ private:
 
 // Implementation
 
-void World::destroyEntity(entity::ID entityID)
+inline void World::destroyEntity(entity::ID entityID)
 {
     for (component::ID compID = 0; compID < m_componentPools.size(); ++compID) {
         const auto hasComponent = (m_componentMasks[entityID] & component::maskFromID(compID)) > 0;
@@ -96,14 +88,14 @@ void World::destroyEntity(entity::ID entityID)
 }
 
 template<typename ComponentType, typename... Args>
-void World::addComponent(entity::ID entityID, Args &&...args)
+inline void World::addComponent(entity::ID entityID, Args &&...args)
 {
     m_componentMasks[entityID] |= component::getMask<ComponentType>();
     getPool<ComponentType>()->add(entityID, std::forward<Args>(args)...);
 }
 
 template<typename ComponentType>
-component::Pool<ComponentType> *World::getPool(bool alloc)
+inline component::Pool<ComponentType> *World::getPool(bool alloc)
 {
     const auto compID = component::getID<ComponentType>();
     if (alloc && !m_componentPools[compID])
@@ -112,13 +104,7 @@ component::Pool<ComponentType> *World::getPool(bool alloc)
 }
 
 template<typename... Components>
-EntityList World::entitiesWith()
-{
-    return { component::getMask<Components...>() };
-}
-
-template<typename... Components>
-void World::forEachEntity(const std::function<void(const entity::Handler &)> &f)
+inline void World::forEachEntity(const std::function<void(const entity::Handler &)> &f)
 {
     const auto entityList = this->entitiesWith<Components...>();
     std::for_each(entityList.begin(), entityList.end(), f);
@@ -126,4 +112,4 @@ void World::forEachEntity(const std::function<void(const entity::Handler &)> &f)
 
 } // namespace ecs
 
-#endif /* !WORLD_HPP_ */
+#endif /* !ECS_INTERNAL_WORLD_HPP_ */

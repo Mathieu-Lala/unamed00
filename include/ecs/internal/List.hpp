@@ -3,16 +3,20 @@
  *
  */
 
-#ifndef LIST_HPP_
-# define LIST_HPP_
+#ifndef ECS_INTERNAL_LIST_HPP_
+# define ECS_INTERNAL_LIST_HPP_
 
 # include <cinttypes>
 # include <limits>
 # include <iterator>
 
+#include <iostream>
+
 namespace ecs {
 
 namespace entity { struct Handler; };
+
+class World;
 
 struct EntityList;
 
@@ -28,14 +32,8 @@ public:
     using reference = entity::Handler &;
     using difference_type = std::ptrdiff_t;
 
-    Iterator() :
-        m_list  (nullptr),
-        m_index (MAX_INDEX)
-    { }
-    Iterator(const EntityList *list, IndexType index) :
-        m_list  (list),
-        m_index (index)
-    { }
+    Iterator() : m_list(nullptr), m_index(MAX_INDEX) { }
+    Iterator(const EntityList *list, IndexType index) : m_list(list), m_index(index) { }
 
     Iterator &operator++();
     Iterator operator++(int);
@@ -54,9 +52,10 @@ private:
 
 struct EntityList {
 
-    component::Mask m_mask;
+    const component::Mask m_mask;
+    World &m_world;
 
-    EntityList(component::Mask mask) : m_mask(mask) { }
+    EntityList(component::Mask mask, World &w) : m_mask(mask), m_world(w) { }
     ~EntityList() = default;
 
     Iterator begin() const { return ++Iterator(this, -1); }
@@ -66,7 +65,7 @@ struct EntityList {
 
 // Implementation
 
-Iterator Iterator::operator++(int)
+inline Iterator Iterator::operator++(int)
 {
     Iterator ret(*this);
     (*this)++;
@@ -75,4 +74,4 @@ Iterator Iterator::operator++(int)
 
 } // namespace ecs
 
-#endif /* !LIST_HPP_ */
+#endif /* !ECS_INTERNAL_LIST_HPP_ */

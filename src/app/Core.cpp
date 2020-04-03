@@ -8,6 +8,8 @@
 #include "app/Core.hpp"
 #include "utils/utils.hpp"
 
+#include "data/Component.hpp"
+
 Core::Core() :
     m_is_running    (true),
     m_shellParser   (*this),
@@ -31,6 +33,12 @@ Core::Core() :
 
 int Core::start()
 {
+    auto world = std::make_unique<ecs::World>();
+
+    auto handler = world->createEntity().add<CShape>(-0.5, -0.5, 1, 1);
+
+    world->flush();
+
     while (this->isRunning()) {
 
         this->m_shellReader.read();
@@ -38,7 +46,7 @@ int Core::start()
         if (this->m_window) {
 
             this->m_window->clear(0x000000FFu);
-            // draw here
+            this->m_window->draw(world);
             this->m_window->render();
 
             graphic::Event e;

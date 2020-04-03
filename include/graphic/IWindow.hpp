@@ -8,6 +8,8 @@
 
 # include <string>
 
+# include "ecs/ECS.hpp"
+
 # include "graphic/Event.hpp"
 
 namespace graphic {
@@ -31,6 +33,8 @@ public:
 
     virtual void render() = 0;
     virtual void clear(unsigned int) = 0;
+
+    virtual void draw(const std::unique_ptr<ecs::World> &) = 0;
 
     virtual bool pollEvent(Event &e) = 0;
 

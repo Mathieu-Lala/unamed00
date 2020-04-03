@@ -3,8 +3,8 @@
  *
  */
 
-#ifndef ENTITY_HPP_
-# define ENTITY_HPP_
+#ifndef ECS_INTERNAL_ENTITY_HPP_
+# define ECS_INTERNAL_ENTITY_HPP_
 
 namespace ecs {
 
@@ -13,20 +13,21 @@ namespace entity {
 struct Handler {
 
     ID m_id;
+    World &m_world;
 
-    Handler(ID id) : m_id(id) { }
+    Handler(ID id, World &w) : m_id(id), m_world(w) { }
     ~Handler() = default;
 
     template<typename ComponentType, typename... Args>
     Handler &add(Args &&...args)
     {
-        World::get()->addComponent<ComponentType>(m_id, std::forward<Args>(args)...);
+        m_world.addComponent<ComponentType>(m_id, std::forward<Args>(args)...);
         return *this;
     }
 
     template<typename ComponentType>
     ComponentType *get() const
-        { return World::get()->getComponent<ComponentType>(m_id); }
+        { return m_world.getComponent<ComponentType>(m_id); }
 
 };
 
@@ -34,4 +35,4 @@ struct Handler {
 
 } // namespace ecs
 
-#endif /* !ENTITY_HPP_ */
+#endif /* !ECS_INTERNAL_ENTITY_HPP_ */

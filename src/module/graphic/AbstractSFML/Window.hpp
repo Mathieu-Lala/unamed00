@@ -29,6 +29,8 @@ public:
     void render() final;
     void clear(unsigned int color) final;
 
+    void draw(const std::unique_ptr<ecs::World> &) override;
+
     bool pollEvent(graphic::Event &out) final;
 
     bool takeScreenShot(const std::string &filepath) final;
