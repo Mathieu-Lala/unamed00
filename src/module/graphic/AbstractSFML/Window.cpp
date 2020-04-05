@@ -11,23 +11,21 @@
 
 #include "Window.hpp"
 
-WindowSFML::WindowSFML()
-{
-}
+const char *vertexShaderSource =
+"#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"}\0";
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
+const char *fragmentShaderSource =
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}\n\0";
 
 int vertexShader;
 int fragmentShader;
@@ -38,7 +36,10 @@ bool WindowSFML::init()
     sf::ContextSettings settings;
     settings.majorVersion = 4;
     settings.minorVersion = 5;
-    settings.attributeFlags = sf::ContextSettings::Core | sf::ContextSettings::Debug;
+    settings.attributeFlags = sf::ContextSettings::Core
+#if PROJECT_BUILD_TYPE == Debug
+        | sf::ContextSettings::Debug;
+#endif
 
     this->m_window.create(sf::VideoMode(1080, 720), "", sf::Style::Default, settings);
     this->m_window.setActive(true);
@@ -133,7 +134,7 @@ void WindowSFML::clear(unsigned int color)
 
 void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
 {
-    world->tickSystem<CShape>([this](CShape *shape) {
+    world->tickSystem<CRectShape>([this](CRectShape *shape) {
 
         float vertices[] = {
             shape->x + shape->w, shape->y + shape->h, 0.0f,

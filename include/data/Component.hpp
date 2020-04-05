@@ -6,12 +6,20 @@
 #ifndef COMPONENT_HPP_
 # define COMPONENT_HPP_
 
-struct CShape {
+struct CRectShape {
 
     float x, y, w, h;
 
-    CShape(float xx, float yy, float ww, float hh) :
+    CRectShape(float xx, float yy, float ww, float hh) :
         x(xx), y(yy), w(ww), h(hh) { }
+
+};
+
+struct CVelocity {
+
+    float x, y;
+
+    CVelocity(float xx, float yy) : x(xx), y(yy) { }
 
 };
 

@@ -14,7 +14,7 @@
 
 class DECLSPEC WindowSFML : public graphic::IWindow {
 public:
-    WindowSFML();
+    WindowSFML() = default;
     virtual ~WindowSFML() = default;
 
     bool init() final;

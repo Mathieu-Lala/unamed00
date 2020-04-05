@@ -45,27 +45,7 @@ int Core::start()
 
         this->m_shellReader.read();
 
-        if (this->m_window) {
-
-            this->m_window->clear(this->m_scene ? this->m_scene->getSkyColor() : 0x000000FFu);
-            this->m_window->draw(this->m_world);
-            this->m_window->render();
-
-            graphic::Event e;
-            e.type = graphic::Event::NONE;
-            while (this->m_window->pollEvent(e)) {
-
-                if (e.type == graphic::Event::CLOSED)
-                    this->m_window->close();
-
-                if (e.type == graphic::Event::KEY_PRESSED)
-                    if (e.key.code == graphic::KeyBoard::F12) {
-                        const auto file = std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png";
-                        this->m_window->takeScreenShot(file);
-                    }
-            }
-
-        }
+        if (this->m_window) this->draw();
 
         if (this->m_scene)
             this->m_scene->onUpdate(this->m_world);
@@ -73,6 +53,27 @@ int Core::start()
     }
 
     return APP_SUCCESS;
+}
+
+void Core::draw()
+{
+    this->m_window->clear(this->m_scene ? this->m_scene->getSkyColor() : 0x000000FFu);
+    this->m_window->draw(this->m_world);
+    this->m_window->render();
+
+    graphic::Event e;
+    while (this->m_window->pollEvent(e)) {
+
+        if (e.type == graphic::Event::CLOSED)
+            this->m_window->close();
+
+        if (e.type == graphic::Event::KEY_PRESSED)
+            if (e.key.code == graphic::KeyBoard::F12) {
+                const auto file = std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png";
+                std::cout << "Take a screenshot in " << file << " " <<
+                    (this->m_window->takeScreenShot(file) ? "success" : "failed") << std::endl;
+            }
+    }
 }
 
 bool Core::setWindowFromModule(const dll::Manager::UID &id)

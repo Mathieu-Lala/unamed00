@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <random>
 
 #include <config/macro.hpp>
 
@@ -13,7 +14,7 @@
 #include "app/shell/Reader.hpp"
 #include "app/shell/Parser.hpp"
 
-void init()
+static void init()
 {
     using namespace std::chrono;
 
@@ -37,6 +38,8 @@ void init()
 int main() try
 {
     init();
+
+    std::srand(std::time(nullptr));
 
     Core core;
 

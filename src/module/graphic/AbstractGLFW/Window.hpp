@@ -13,7 +13,7 @@
 
 class WindowGLFW : public graphic::IWindow {
 public:
-    WindowGLFW();
+    WindowGLFW() = default;
     virtual ~WindowGLFW();
 
     bool init() final;
@@ -37,6 +37,10 @@ public:
 private:
 
     GLFWwindow *m_window;
+
+    static void s_keyCallback(GLFWwindow *, int, int, int, int);
+
+    static graphic::Event s_actifEvent;
 
 };
 

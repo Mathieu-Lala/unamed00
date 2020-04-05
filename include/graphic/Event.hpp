@@ -37,6 +37,8 @@ struct Event {
         KeyEvent key;
     };
 
+    Event() : type(NONE) {}
+
 };
 
 } // namespace graphic

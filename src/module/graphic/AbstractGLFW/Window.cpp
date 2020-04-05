@@ -3,6 +3,7 @@
  *
  */
 
+#include <cstring>
 #include <stdexcept>
 
 #include <utils/warning.hpp>
@@ -13,27 +14,28 @@ DISABLE_WARN_UNUSED // unused variable in std_image.h
 #include <stb_image.h>
 DISABLE_WARNING_POP
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+
 #include <data/Component.hpp>
 
 #include "Window.hpp"
 
-WindowGLFW::WindowGLFW()
-{
-}
+const char *vertexShaderSource =
+"#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"}\0";
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
+const char *fragmentShaderSource =
+"#version 330 core\n"
+"out vec4 FragColor;\n"
+"void main()\n"
+"{\n"
+"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"}\n\0";
 
 int vertexShader;
 int fragmentShader;
@@ -50,9 +52,7 @@ bool WindowGLFW::init()
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress))
         return false;
 
-    int w, h;
-    glfwGetFramebufferSize(this->m_window, &w, &h);
-    glViewport(0, 0, w, h);
+    glfwSetKeyCallback(this->m_window, s_keyCallback);
 
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -85,7 +85,7 @@ bool WindowGLFW::isRunning()
 
 void WindowGLFW::close()
 {
-    glfwSetWindowShouldClose(this->m_window, true);
+    glfwSetWindowShouldClose(this->m_window, GLFW_TRUE);
 }
 
 void WindowGLFW::setTitle(const std::string &title)
@@ -98,19 +98,18 @@ void WindowGLFW::setSize(unsigned int x, unsigned int y)
     glfwSetWindowSize(this->m_window, x, y);
 }
 
-// FIXME
-bool WindowGLFW::setFavicon(const std::string &/*filepath*/)
+bool WindowGLFW::setFavicon(const std::string &filepath)
 {
-//    stbi_set_flip_vertically_on_load(true);
-//
-//    int width; int height; int channels;
-//    auto pixels = stbi_load(filepath.data(), &width, &height, &channels, STBI_default);
-//    if (!pixels)
-//        return false;
-//
-//    GLFWimage icons = { .width = width, .height = height, .pixels = pixels };
-//    glfwSetWindowIcon(this->m_window, 1, &icons);
-//    stbi_image_free(pixels);
+    stbi_set_flip_vertically_on_load(true);
+
+    int width; int height; int channels;
+    auto pixels = stbi_load(filepath.data(), &width, &height, &channels, STBI_rgb_alpha);
+    if (!pixels) return false;
+
+    GLFWimage icons = { .width = width, .height = height, .pixels = pixels };
+    glfwSetWindowIcon(this->m_window, 1, &icons);
+    stbi_image_free(pixels);
+
     return true;
 }
 
@@ -131,7 +130,7 @@ void WindowGLFW::clear(unsigned int color)
 
 void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
 {
-    world->tickSystem<CShape>([this](CShape *shape) {
+    world->tickSystem<CRectShape>([this](CRectShape *shape) {
 
         float vertices[] = {
             shape->x + shape->w, shape->y + shape->h, 0.0f,
@@ -174,14 +173,58 @@ void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
     });
 }
 
-bool WindowGLFW::pollEvent(graphic::Event &)
+graphic::Event WindowGLFW::s_actifEvent = {};
+
+void WindowGLFW::s_keyCallback(GLFWwindow *, int /*key*/, int scancode, int action, int /*mods*/)
+{
+    switch (action) {
+        case GLFW_PRESS: s_actifEvent.type = graphic::Event::KEY_PRESSED; break;
+        case GLFW_RELEASE: s_actifEvent.type = graphic::Event::KEY_RELEASED; break;
+        default: break;
+    }
+    s_actifEvent.key.code = static_cast<graphic::KeyBoard::Key>(scancode);
+}
+
+bool WindowGLFW::pollEvent(graphic::Event &out)
 {
     glfwPollEvents();
 
-    return false;
+    if (s_actifEvent.type == graphic::Event::NONE)
+        return false;
+
+    out = s_actifEvent;
+    s_actifEvent = {};
+
+    return true;
 }
 
-bool WindowGLFW::takeScreenShot(const std::string &)
+bool WindowGLFW::takeScreenShot(const std::string &filename)
 {
-    return false;
+    GLint viewport[4];
+
+    glGetIntegerv(GL_VIEWPORT, viewport);
+    const auto &x = viewport[0];
+    const auto &y = viewport[1];
+    const auto &width = viewport[2];
+    const auto &height = viewport[3];
+
+    auto pixels = new char[width * height * 4];
+
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
+    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+    char rgb[4];
+    for (int y = 0; y < height / 2; ++y)
+        for (int x = 0; x < width; ++x) {
+            int top = (x + y * width) * 4;
+            int bottom = (x + (height - y - 1) * width) * 4;
+
+            std::memcpy(rgb, pixels + top, sizeof(rgb));
+            std::memcpy(pixels + top, pixels + bottom, sizeof(rgb));
+            std::memcpy(pixels + bottom, rgb, sizeof(rgb));
+        }
+
+    bool saved = !!stbi_write_png(filename.data(), width, height, 4, pixels, 0);
+    delete[] pixels;
+    return saved;
 }

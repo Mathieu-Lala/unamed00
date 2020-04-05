@@ -37,6 +37,9 @@ ON_ATTACH
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
+    glfwSetErrorCallback([](int error, const char *description) {
+        std::cerr << "GLFW error: [code=" << error << "]: " << description << std::endl;
+    });
 }
 
 ON_DETACH
