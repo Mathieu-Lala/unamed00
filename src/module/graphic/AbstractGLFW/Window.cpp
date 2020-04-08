@@ -5,6 +5,9 @@
 
 #include <cstring>
 #include <stdexcept>
+#include <fstream>
+
+#include <config/cmake_config.hpp>
 
 #include <utils/warning.hpp>
 
@@ -21,25 +24,16 @@ DISABLE_WARNING_POP
 
 #include "Window.hpp"
 
-const char *vertexShaderSource =
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
+static int shaderProgram; /* tmp */
 
-const char *fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
-
-int vertexShader;
-int fragmentShader;
-int shaderProgram;
+std::string fileToString(const std::string_view path)
+{
+    std::ifstream f(path.data());
+    return std::string(
+        (std::istreambuf_iterator<char>(f)),
+        (std::istreambuf_iterator<char>( ))
+    );
+}
 
 bool WindowGLFW::init()
 {
@@ -54,12 +48,17 @@ bool WindowGLFW::init()
 
     glfwSetKeyCallback(this->m_window, s_keyCallback);
 
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    /* tmp */
+    auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    auto vertexShaderSource = fileToString(RESOURCE_DIR "shaders/simple.vs");
+    auto rawVertexShaderSource = vertexShaderSource.data();
+    glShaderSource(vertexShader, 1, &rawVertexShaderSource, nullptr);
     glCompileShader(vertexShader);
 
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    auto fragmentShaderSource = fileToString(RESOURCE_DIR "shaders/simple.fs");
+    auto rawFragmentShaderSource = fragmentShaderSource.data();
+    glShaderSource(fragmentShader, 1, &rawFragmentShaderSource, nullptr);
     glCompileShader(fragmentShader);
 
     shaderProgram = glCreateProgram();
@@ -132,17 +131,15 @@ void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
 {
     world->tickSystem<CRectShape>([this](CRectShape *shape) {
 
-        float vertices[] = {
-            shape->x + shape->w, shape->y + shape->h, 0.0f,
-            shape->x + shape->w, shape->y,            0.0f,
-            shape->x,            shape->y,            0.0f,
-            shape->x,            shape->y + shape->h, 0.0f
+        const float vertices[] = {
+            // position                                      // colors
+            shape->x + shape->w, shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x + shape->w, shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x,            shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x,            shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
         };
 
-        unsigned int indices[] = {
-            0, 1, 3, // first Triangle
-            1, 2, 3  // second Triangle
-        };
+        constexpr unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
 
         unsigned int VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -157,14 +154,21 @@ void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
+
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(GL_NONE);
+        glUseProgram(GL_NONE);
 
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);

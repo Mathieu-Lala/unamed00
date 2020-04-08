@@ -14,7 +14,7 @@ public:
     virtual ~ExampleScene() = default;
 
     bool onCreate(const std::unique_ptr<ecs::World> &) override;
-    void onUpdate(const std::unique_ptr<ecs::World> &) override;
+    void onUpdate(const std::unique_ptr<ecs::World> &, float) override;
     unsigned int getSkyColor() override;
 
 protected:

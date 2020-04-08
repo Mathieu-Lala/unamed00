@@ -11,26 +11,6 @@
 
 #include "Window.hpp"
 
-const char *vertexShaderSource =
-"#version 330 core\n"
-"layout (location = 0) in vec3 aPos;\n"
-"void main()\n"
-"{\n"
-"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-"}\0";
-
-const char *fragmentShaderSource =
-"#version 330 core\n"
-"out vec4 FragColor;\n"
-"void main()\n"
-"{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
-
-int vertexShader;
-int fragmentShader;
-int shaderProgram;
-
 bool WindowSFML::init()
 {
     sf::ContextSettings settings;
@@ -43,42 +23,11 @@ bool WindowSFML::init()
 
     this->m_window.create(sf::VideoMode(1080, 720), "", sf::Style::Default, settings);
     this->m_window.setActive(true);
+    this->m_window.setVerticalSyncEnabled(true);
 
     gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction));
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glClearDepth(1.f);
-
-    glEnable(GL_TEXTURE_2D);
-
-    // Setup a perspective projection
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisableClientState(GL_NORMAL_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
-
-
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
-
-    return true;
+    return m_shader.loadFromFile(RESOURCE_DIR "shaders/simple.vs", RESOURCE_DIR "shaders/simple.fs");
 }
 
 bool WindowSFML::isRunning()
@@ -104,14 +53,9 @@ void WindowSFML::setSize(unsigned int x, unsigned int y)
 bool WindowSFML::setFavicon(const std::string &filepath)
 {
     sf::Image img;
+    if (!img.loadFromFile(filepath)) return false;
 
-    if (!img.loadFromFile(filepath))
-        return false;
-
-    this->m_window.setIcon(
-        img.getSize().x, img.getSize().y,
-        img.getPixelsPtr());
-
+    this->m_window.setIcon(img.getSize().x, img.getSize().y, img.getPixelsPtr());
     return true;
 }
 
@@ -128,25 +72,21 @@ void WindowSFML::clear(unsigned int color)
     const float a = (color & 0x000000FF) / 255.0f;
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    //this->m_window.clear(sf::Color(color));
 }
 
 void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
 {
     world->tickSystem<CRectShape>([this](CRectShape *shape) {
 
-        float vertices[] = {
-            shape->x + shape->w, shape->y + shape->h, 0.0f,
-            shape->x + shape->w, shape->y,            0.0f,
-            shape->x,            shape->y,            0.0f,
-            shape->x,            shape->y + shape->h, 0.0f
+        const float vertices[] = {
+            // position                                      // colors
+            shape->x + shape->w, shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x + shape->w, shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x,            shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x,            shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
         };
 
-        unsigned int indices[] = {
-            0, 1, 3, // first Triangle
-            1, 2, 3  // second Triangle
-        };
+        constexpr unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
 
         unsigned int VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -161,14 +101,21 @@ void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        // position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
         glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        // color attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
 
-        glUseProgram(shaderProgram);
+        sf::Shader::bind(&m_shader);
         glBindVertexArray(VAO);
+
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glBindVertexArray(GL_NONE);
+        sf::Shader::bind(nullptr);
 
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);

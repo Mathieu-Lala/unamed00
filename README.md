@@ -9,7 +9,7 @@ This project was generated from [this template](https://github.com/Mathieu-Lala/
 
 ## Screenshots
 
-![Alt](resources/screenshots/2020-04-05_17-55-23.png?raw=true "Screencapture v0.0.15.0")
+![Alt](resources/screenshots/2020-04-07_21-33-12.png?raw=true "Screencapture v0.0.15.0")
 
 ### Prerequisite
 

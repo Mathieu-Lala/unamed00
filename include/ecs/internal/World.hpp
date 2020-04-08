@@ -49,6 +49,10 @@ public:
     void flush()
         { m_entities.assign(m_entities.size(), true); }
 
+    template<typename... Components>
+    EntityList entitiesWith()
+        { return { component::getMask<Components...>(), *this }; }
+
 private:
 
     // boolean value : valid entity or not
@@ -65,10 +69,6 @@ private:
 
     template<typename ComponentType>
     component::Pool<ComponentType> *getPool(bool alloc = true);
-
-    template<typename... Components>
-    EntityList entitiesWith()
-        { return { component::getMask<Components...>(), *this }; }
 
     template<typename... Components>
     void forEachEntity(const std::function<void(const entity::Handler &)> &);

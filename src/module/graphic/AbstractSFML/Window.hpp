@@ -39,6 +39,8 @@ private:
 
     sf::RenderWindow m_window;
 
+    sf::Shader m_shader;
+
 };
 
 #endif /* !ABSTRACT_SFML_WINDOW_HPP_ */

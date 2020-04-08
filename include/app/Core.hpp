@@ -47,7 +47,7 @@ private:
     using WindowPtr = std::unique_ptr<graphic::IWindow, graphic::IWindow::Dtor>;
     WindowPtr m_window;
 
-    void draw();
+    void draw(float elapsedTime);
 
     using ScenePtr = std::unique_ptr<scene::IScene, scene::IScene::Dtor>;
     ScenePtr m_scene;

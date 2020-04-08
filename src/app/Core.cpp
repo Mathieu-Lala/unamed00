@@ -41,21 +41,29 @@ Core::Core() :
 
 int Core::start()
 {
+    using namespace std::chrono;
+
+    float elapsedTime = 0.0f;
+
     while (this->isRunning()) {
+
+        const auto start = system_clock::now();
 
         this->m_shellReader.read();
 
-        if (this->m_window) this->draw();
+        if (this->m_window) this->draw(elapsedTime);
 
         if (this->m_scene)
-            this->m_scene->onUpdate(this->m_world);
+            this->m_scene->onUpdate(this->m_world, elapsedTime);
+
+        elapsedTime = duration_cast<milliseconds>(system_clock::now() - start).count();
 
     }
 
     return APP_SUCCESS;
 }
 
-void Core::draw()
+void Core::draw(float)
 {
     this->m_window->clear(this->m_scene ? this->m_scene->getSkyColor() : 0x000000FFu);
     this->m_window->draw(this->m_world);
@@ -90,6 +98,7 @@ bool Core::setWindowFromModule(const dll::Manager::UID &id)
 
         if (!this->m_window->init()) {
             std::cerr << "Failed to initialize the window" << std::endl;
+            this->m_window.reset(nullptr);
             return false;
         }
 
@@ -118,6 +127,7 @@ bool Core::setSceneFromModule(const dll::Manager::UID &id)
 
         if (!this->m_scene->onCreate(this->m_world)) {
             std::cerr << "Failed to initialize the scene" << std::endl;
+            this->m_scene.reset(nullptr);
             return false;
         }
 
