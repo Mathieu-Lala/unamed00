@@ -4,7 +4,6 @@
  */
 
 #include <algorithm>
-#include <iostream>
 #include <functional>
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -112,11 +111,13 @@ catch (const std::out_of_range &)
     return {};
 }
 
-dll::Manager::Info dll::Manager::info(const UID &uid)
+dll::Manager::Info dll::Manager::info(const UID &uid) const
 {
     const auto &handler = this->m_handlers.at(uid);
+
     return Info(
         remove_extension(fs::path(handler->getPath()).filename().string()),
         fs::path(handler->getPath().substr(0, handler->getPath().rfind('/'))).filename().string(),
-        uid);
+        uid
+    );
 }

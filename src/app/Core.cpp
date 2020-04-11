@@ -44,44 +44,44 @@ int Core::start()
     using namespace std::chrono;
 
     float elapsedTime = 0.0f;
+    graphic::Event e;
 
     while (this->isRunning()) {
-
         const auto start = system_clock::now();
+
+        e = {};
+
 
         this->m_shellReader.read();
 
-        if (this->m_window) this->draw(elapsedTime);
+        if (this->m_window) {
+
+            this->m_window->clear(this->m_scene ? this->m_scene->getSkyColor() : 0x000000FFu);
+            this->m_window->draw(this->m_world);
+            this->m_window->render();
+
+            while (this->m_window->pollEvent(e)) {
+
+                if (e.type == graphic::Event::CLOSED)
+                    this->m_window->close();
+
+                if (e.type == graphic::Event::KEY_PRESSED)
+                    if (e.key.code == graphic::KeyBoard::F12) {
+                        const auto file = std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png";
+                            std::cout << "Take a screenshot in " << file << " " <<
+                        (this->m_window->takeScreenShot(file) ? "success" : "failed") << std::endl;
+                    }
+            }
+
+        }
 
         if (this->m_scene)
-            this->m_scene->onUpdate(this->m_world, elapsedTime);
+            this->m_scene->onUpdate(this->m_world, elapsedTime, e);
 
         elapsedTime = duration_cast<milliseconds>(system_clock::now() - start).count();
-
     }
 
     return APP_SUCCESS;
-}
-
-void Core::draw(float)
-{
-    this->m_window->clear(this->m_scene ? this->m_scene->getSkyColor() : 0x000000FFu);
-    this->m_window->draw(this->m_world);
-    this->m_window->render();
-
-    graphic::Event e;
-    while (this->m_window->pollEvent(e)) {
-
-        if (e.type == graphic::Event::CLOSED)
-            this->m_window->close();
-
-        if (e.type == graphic::Event::KEY_PRESSED)
-            if (e.key.code == graphic::KeyBoard::F12) {
-                const auto file = std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png";
-                std::cout << "Take a screenshot in " << file << " " <<
-                    (this->m_window->takeScreenShot(file) ? "success" : "failed") << std::endl;
-            }
-    }
 }
 
 bool Core::setWindowFromModule(const dll::Manager::UID &id)

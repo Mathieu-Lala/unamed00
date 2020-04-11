@@ -6,6 +6,10 @@
 #ifndef COMPONENT_HPP_
 # define COMPONENT_HPP_
 
+# include <functional>
+
+# include <graphic/Event.hpp>
+
 struct CRectShape {
 
     float x, y, w, h;
@@ -20,6 +24,16 @@ struct CVelocity {
     float x, y;
 
     CVelocity(float xx, float yy) : x(xx), y(yy) { }
+
+};
+
+struct CWithEvent {
+
+    using Callback = std::function<void(const graphic::Event &)>;
+
+    Callback callback;
+
+    CWithEvent(const Callback &f) : callback(f) { }
 
 };
 

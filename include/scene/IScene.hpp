@@ -7,6 +7,7 @@
 # define ISCENE_HPP_
 
 # include <ecs/ECS.hpp>
+# include <graphic/Event.hpp>
 
 namespace scene {
 
@@ -18,7 +19,7 @@ public:
     virtual ~IScene() = default;
 
     virtual bool onCreate(const std::unique_ptr<ecs::World> &) = 0;
-    virtual void onUpdate(const std::unique_ptr<ecs::World> &, float elapsedTime) = 0;
+    virtual void onUpdate(const std::unique_ptr<ecs::World> &, float elapsedTime, const graphic::Event &) = 0;
 
     virtual unsigned int getSkyColor() = 0;
 

@@ -41,11 +41,10 @@ public:
         Name name;
         std::string moduleType;
         UID uid;
-//        Handler::Path path;
     };
 
     std::vector<UID> list() const;
-    Info info(const UID &);
+    Info info(const UID &) const;
 
     std::vector<Info> getAvailable() const;
 

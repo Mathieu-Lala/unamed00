@@ -76,15 +76,14 @@ private:
 
 // Implementation
 
-inline void World::destroyEntity(entity::ID entityID)
-{
-    for (component::ID compID = 0; compID < m_componentPools.size(); ++compID) {
-        const auto hasComponent = (m_componentMasks[entityID] & component::maskFromID(compID)) > 0;
-        if (m_componentPools[compID] && hasComponent)
-            m_componentPools[compID]->remove(entityID);
+inline void World::destroyEntity(entity::ID entityID) {
+    for (component::ID compID = 0; compID < this->m_componentPools.size(); ++compID) {
+        const auto hasComponent = (this->m_componentMasks[entityID] & component::maskFromID(compID)) > 0;
+        if (this->m_componentPools[compID] && hasComponent)
+            this->m_componentPools[compID]->remove(entityID);
     }
-    m_componentMasks[entityID] = 0;
-    m_freeEntityID.push(entityID);
+    this->m_componentMasks[entityID] = 0;
+    this->m_freeEntityID.push(entityID);
 }
 
 template<typename ComponentType, typename... Args>

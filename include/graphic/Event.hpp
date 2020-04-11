@@ -3,9 +3,10 @@
  *
  */
 
-#ifndef EVENT_HPP_
-# define EVENT_HPP_
+#ifndef GRAPHIC_EVENT_HPP_
+# define GRAPHIC_EVENT_HPP_
 
+# include <cstdint>
 # include "graphic/Key.hpp"
 
 namespace graphic {
@@ -37,10 +38,10 @@ struct Event {
         KeyEvent key;
     };
 
-    Event() : type(NONE) {}
+    Event() : type(NONE) { }
 
 };
 
 } // namespace graphic
 
-#endif /* !EVENT_HPP_ */
+#endif /* !GRAPHIC_EVENT_HPP_ */

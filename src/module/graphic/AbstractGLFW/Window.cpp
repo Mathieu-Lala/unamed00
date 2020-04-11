@@ -23,6 +23,7 @@ DISABLE_WARNING_POP
 #include <data/Component.hpp>
 
 #include "Window.hpp"
+#include "Keyboard.hpp"
 
 static int shaderProgram; /* tmp */
 
@@ -179,14 +180,14 @@ void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
 
 graphic::Event WindowGLFW::s_actifEvent = {};
 
-void WindowGLFW::s_keyCallback(GLFWwindow *, int /*key*/, int scancode, int action, int /*mods*/)
+void WindowGLFW::s_keyCallback(GLFWwindow *, int key, int /*scancode*/, int action, int /*mods*/)
 {
     switch (action) {
-        case GLFW_PRESS: s_actifEvent.type = graphic::Event::KEY_PRESSED; break;
+        case GLFW_PRESS:   s_actifEvent.type = graphic::Event::KEY_PRESSED; break;
         case GLFW_RELEASE: s_actifEvent.type = graphic::Event::KEY_RELEASED; break;
         default: break;
     }
-    s_actifEvent.key.code = static_cast<graphic::KeyBoard::Key>(scancode);
+    s_actifEvent.key.code = toValidKeyCode(key);
 }
 
 bool WindowGLFW::pollEvent(graphic::Event &out)

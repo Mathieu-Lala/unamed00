@@ -6,8 +6,6 @@
 #ifndef ECS_INTERNAL_IMPLEMENTATION_HPP_
 # define ECS_INTERNAL_IMPLEMENTATION_HPP_
 
-#include <iostream>
-
 namespace ecs {
 
 inline entity::Handler World::createEntity()

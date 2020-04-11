@@ -10,8 +10,6 @@
 # include <limits>
 # include <iterator>
 
-#include <iostream>
-
 namespace ecs {
 
 namespace entity { struct Handler; };
