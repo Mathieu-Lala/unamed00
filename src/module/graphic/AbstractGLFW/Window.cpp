@@ -98,7 +98,7 @@ void WindowGLFW::setSize(unsigned int x, unsigned int y)
     glfwSetWindowSize(this->m_window, x, y);
 }
 
-bool WindowGLFW::setFavicon(const std::string &filepath)
+bool WindowGLFW::setFavicon(const std::string& filepath)
 {
     stbi_set_flip_vertically_on_load(true);
 
@@ -106,7 +106,11 @@ bool WindowGLFW::setFavicon(const std::string &filepath)
     auto pixels = stbi_load(filepath.data(), &width, &height, &channels, STBI_rgb_alpha);
     if (!pixels) return false;
 
-    GLFWimage icons = { .width = width, .height = height, .pixels = pixels };
+    GLFWimage icons;
+    icons.width = width;
+    icons.height = height;
+    icons.pixels = pixels;
+
     glfwSetWindowIcon(this->m_window, 1, &icons);
     stbi_image_free(pixels);
 

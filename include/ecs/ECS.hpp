@@ -12,7 +12,7 @@
 namespace ecs {
 namespace entity {
 
-using ID = std::size_t;
+using ID = std::uint64_t;
 
 }
 }

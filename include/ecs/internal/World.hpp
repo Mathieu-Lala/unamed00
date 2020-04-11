@@ -7,6 +7,7 @@
 # define ECS_INTERNAL_WORLD_HPP_
 
 # include <algorithm>
+# include <array>
 # include <functional>
 # include <memory>
 # include <queue>

@@ -10,6 +10,8 @@
 # include <limits>
 # include <iterator>
 
+# undef max // Window.h define max so we can't use std::numeric_limit<T>::max();
+
 namespace ecs {
 
 namespace entity { struct Handler; };
@@ -21,8 +23,8 @@ struct EntityList;
 // used by std::for_each
 class Iterator {
 public:
-    using IndexType = std::size_t;
-    static constexpr IndexType MAX_INDEX = std::numeric_limits<IndexType>::max();
+    using IndexType = std::uint64_t;
+    static constexpr auto MAX_INDEX = std::numeric_limits<IndexType>::max();
 
     using iterator_category = std::forward_iterator_tag;
     using value_type = entity::Handler;

@@ -23,9 +23,9 @@ EXTERN_C DECLSPEC void destroyWindow(graphic::IWindow *w)
     delete w;
 }
 
-EXTERN_C DECLSPEC std::string getName()
+EXTERN_C DECLSPEC const char *getName()
 {
-    return std::string("GLFW v") + glfwGetVersionString();
+    return glfwGetVersionString();
 }
 
 ON_ATTACH

@@ -103,8 +103,8 @@ bool Core::setWindowFromModule(const dll::Manager::UID &id)
             return false;
         }
 
-        const auto name_f = module->load<std::string(*)()>("getName");
-        const auto title = (name_f ? name_f() : "Unknown") + " - RenderWindow - " PROJECT_NAME "\\v" PROJECT_VERSION;
+        const auto name_f = module->load<const char * (*)()>("getName");
+        const auto title = std::string(name_f ? name_f() : "Unknown") + " - RenderWindow - " PROJECT_NAME "\\v" PROJECT_VERSION;
         this->m_window->setTitle(title);
 
         this->m_window->setFavicon(RESOURCE_DIR "icon/favicon.png");
