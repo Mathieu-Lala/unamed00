@@ -14,11 +14,15 @@
 #include "app/shell/Reader.hpp"
 #include "app/shell/Parser.hpp"
 
-static void init()
+namespace {
+/**
+ * @brief Initialize the exit callbacks, and a start-up clock
+ */
+void init() noexcept
 {
     using namespace std::chrono;
 
-    static const auto start_application = system_clock::now();
+    static const auto start_application { system_clock::now() };
 
     std::set_terminate([] {
         std::cout << "Program terminated" << std::endl;
@@ -26,24 +30,26 @@ static void init()
     });
 
     std::atexit([] {
-        const auto delay = duration_cast<milliseconds>(system_clock::now() - start_application).count();
+        const auto delay { duration_cast<milliseconds>(system_clock::now() - start_application).count() };
         std::cout << "Application exited after: " << std::fixed << std::setprecision(3) <<
             (static_cast<double>(delay) / 1000.0f) << " seconds" << std::endl;
     });
 }
+}
 
 /**
- * @brief entry point of the application
+ * @brief Entry point of the application
  */
-int main() try
+auto main() -> int try
 {
     init();
 
     std::srand(std::time(nullptr));
 
-    Core core;
+    Core core{ };
 
     return core.start();
+
 }
 catch (const std::exception &e)
 {
@@ -52,6 +58,6 @@ catch (const std::exception &e)
 }
 catch (...)
 {
-    std::cerr << "Program terminated with active throw" << std::endl;
+    std::cerr << "Program terminated with an active throw" << std::endl;
     throw;
 }

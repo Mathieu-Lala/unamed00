@@ -22,6 +22,13 @@ private:
 
     ecs::entity::ID m_player;
 
+    int m_level;
+    float m_gameClock;
+
+    void restartParty(const std::unique_ptr<ecs::World> &);
+
+    void spawnEnnemies(const std::unique_ptr<ecs::World> &world, int count);
+
 };
 
 #endif /* !EXAMPLESCENE_HPP_ */

@@ -19,6 +19,13 @@ public:
     World() = default;
     ~World() = default;
 
+    void clearAll() {
+        m_entities = {};
+        m_freeEntityID = {};
+        m_componentMasks = {};
+        m_componentPools = {};
+    }
+
     entity::Handler createEntity();
     void destroyEntity(entity::ID);
 

@@ -29,6 +29,10 @@ struct Handler {
     ComponentType *get() const
         { return m_world.getComponent<ComponentType>(m_id); }
 
+    template<typename ComponentType>
+    bool own(const ComponentType *component)
+        { return this->get<ComponentType>() == component; }
+
 };
 
 } // namespace entity

@@ -11,6 +11,8 @@
 
 #include "Window.hpp"
 
+#include <iostream>
+
 bool WindowSFML::init()
 {
     sf::ContextSettings settings;
@@ -47,7 +49,8 @@ void WindowSFML::setTitle(const std::string &title)
 
 void WindowSFML::setSize(unsigned int x, unsigned int y)
 {
-    this->m_window.setSize(sf::Vector2u(x, y));
+    this->m_window.setSize({ x, y });
+    this->m_window.setView(sf::View(sf::Vector2f(0, 0), sf::Vector2f(x, y)));
 }
 
 bool WindowSFML::setFavicon(const std::string &filepath)
@@ -76,7 +79,7 @@ void WindowSFML::clear(unsigned int color)
 
 void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
 {
-    world->tickSystem<CRectShape>([this](CRectShape *shape) {
+    world->tickSystem<const CRectShape>([this](const CRectShape *shape) {
 
         const float vertices[] = {
             // position                                      // colors

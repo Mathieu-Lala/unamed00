@@ -213,23 +213,22 @@ bool WindowGLFW::takeScreenShot(const std::string &filename)
     const auto &width = viewport[2];
     const auto &height = viewport[3];
 
-    auto pixels = new char[width * height * 4];
+    constexpr auto CHANNEL = 4;
+    std::vector<char> pixels(width * height * CHANNEL);
 
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
-    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    glReadPixels(x, y, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
 
-    char rgb[4];
-    for (int y = 0; y < height / 2; ++y)
-        for (int x = 0; x < width; ++x) {
-            int top = (x + y * width) * 4;
-            int bottom = (x + (height - y - 1) * width) * 4;
+    std::array<char, CHANNEL> pixel;
+    for (auto y = 0; y < height / 2; ++y)
+        for (auto x = 0; x < width; ++x) {
+            const auto top = (x + y * width) * pixel.size();
+            const auto bottom = (x + (height - y - 1) * width) * pixel.size();
 
-            std::memcpy(rgb, pixels + top, sizeof(rgb));
-            std::memcpy(pixels + top, pixels + bottom, sizeof(rgb));
-            std::memcpy(pixels + bottom, rgb, sizeof(rgb));
+            std::memcpy(pixel.data(),           pixels.data() + top,    pixel.size());
+            std::memcpy(pixels.data() + top,    pixels.data() + bottom, pixel.size());
+            std::memcpy(pixels.data() + bottom, pixel.data(),           pixel.size());
         }
 
-    bool saved = !!stbi_write_png(filename.data(), width, height, 4, pixels, 0);
-    delete[] pixels;
-    return saved;
+    return !!stbi_write_png(filename.data(), width, height, 4, pixels.data(), 0);
 }

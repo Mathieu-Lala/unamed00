@@ -49,10 +49,9 @@ int Core::start()
     while (this->isRunning()) {
         const auto start = system_clock::now();
 
-        e = {};
-
-
         this->m_shellReader.read();
+
+        e = {};
 
         if (this->m_window) {
 
@@ -60,19 +59,8 @@ int Core::start()
             this->m_window->draw(this->m_world);
             this->m_window->render();
 
-            while (this->m_window->pollEvent(e)) {
-
-                if (e.type == graphic::Event::CLOSED)
-                    this->m_window->close();
-
-                if (e.type == graphic::Event::KEY_PRESSED)
-                    if (e.key.code == graphic::KeyBoard::F12) {
-                        const auto file = std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png";
-                            std::cout << "Take a screenshot in " << file << " " <<
-                        (this->m_window->takeScreenShot(file) ? "success" : "failed") << std::endl;
-                    }
-            }
-
+            if (this->m_window->pollEvent(e))
+                this->handleEvent(e);
         }
 
         if (this->m_scene)
@@ -82,6 +70,19 @@ int Core::start()
     }
 
     return APP_SUCCESS;
+}
+
+void Core::handleEvent(const graphic::Event &e)
+{
+    if (e.type == graphic::Event::CLOSED)
+        this->m_window->close();
+
+    if (e.type == graphic::Event::KEY_PRESSED)
+        if (e.key.code == graphic::KeyBoard::F12) {
+            const auto file = std::string(RESOURCE_DIR) + "screenshots/" + timeStampToString() + ".png";
+            std::cout << "Take a screenshot in " << file << " " <<
+                (this->m_window->takeScreenShot(file) ? "success" : "failed") << std::endl;
+        }
 }
 
 bool Core::setWindowFromModule(const dll::Manager::UID &id)
@@ -131,7 +132,6 @@ bool Core::setSceneFromModule(const dll::Manager::UID &id)
             return false;
         }
 
-        this->m_world->flush();
         return true;
     }
 }

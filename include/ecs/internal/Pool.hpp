@@ -23,15 +23,16 @@ struct BlockSize {
     static constexpr type DEFAULT_BLOCK_SIZE = 64ul;
 
     template<typename T>
-    static constexpr type get(const T *, ...)
+    static constexpr
+    auto get(const T *, ...) -> type
     {
         return DEFAULT_BLOCK_SIZE;
     }
 
     template<typename T>
     static constexpr
+    auto get(const T *, int) ->
         std::enable_if_t<!std::is_void_v<decltype(T::BLOCK_SIZE)>, type>
-    get(const T *, int)
     {
         return T::BLOCK_SIZE;
     }
@@ -53,27 +54,28 @@ public:
     Pool() = default;
     virtual ~Pool()
     {
-        for (auto &i : mBlocks)
+        for (auto &i : m_blocks)
             delete[] i.data;
     }
 
     template<typename... Args>
-    ComponentType *add(entity::ID entityID, Args ...args)
+    auto add(entity::ID entityID, Args ...args) -> ComponentType *
     {
         const auto [blockIndex, componentIndex] = getIndices(entityID);
 
-        if (mBlocks.size() < blockIndex + 1)
-            mBlocks.resize(blockIndex + 1);
+        if (m_blocks.size() < blockIndex + 1)
+            m_blocks.resize(blockIndex + 1);
 
-        auto &block = mBlocks[blockIndex];
+        auto &block = m_blocks[blockIndex];
         if (!block.data) block.data = new std::int8_t[BLOCK_SIZE * sizeof(ComponentType)];
         block.occupied[componentIndex] = true;
 
         return new(getPointer(blockIndex, componentIndex)) ComponentType(std::forward<Args>(args)...);
     }
 
-    ComponentType *get(entity::ID entityID)
+    auto get(entity::ID entityID) -> ComponentType *
     {
+        if (!has(entityID)) return nullptr;
         const auto [blockIndex, componentIndex] = getIndices(entityID);
         return getPointer(blockIndex, componentIndex);
     }
@@ -83,22 +85,29 @@ public:
         const auto [blockIndex, componentIndex] = getIndices(entityID);
         auto component = getPointer(blockIndex, componentIndex);
         component->~ComponentType();
-        mBlocks[blockIndex].occupied[componentIndex] = false;
+        m_blocks[blockIndex].occupied[componentIndex] = false;
         checkBlockUsage(blockIndex);
+    }
+
+    auto has(entity::ID entityID) const -> bool
+    {
+        const auto [blockIndex, componentIndex] = getIndices(entityID);
+        return m_blocks.size() > blockIndex && m_blocks[blockIndex].occupied[componentIndex];
     }
 
 private:
 
     static constexpr auto BLOCK_SIZE = BlockSize::get<ComponentType>(nullptr, 0);
 
-    static constexpr auto getIndices(entity::ID entityID) -> std::pair<size_t, size_t>
+    static constexpr
+    auto getIndices(entity::ID entityID) -> std::pair<size_t, size_t>
     {
         return { entityID / BLOCK_SIZE, entityID % BLOCK_SIZE };
     }
 
-    ComponentType *getPointer(std::size_t blockIndex, std::size_t componentIndex)
+    auto getPointer(std::size_t blockIndex, std::size_t componentIndex) -> ComponentType *
     {
-        return reinterpret_cast<ComponentType *>(mBlocks[blockIndex].data) + componentIndex;
+        return reinterpret_cast<ComponentType *>(m_blocks[blockIndex].data) + componentIndex;
     }
 
     struct Block {
@@ -109,11 +118,11 @@ private:
         ~Block() = default;
     };
 
-    std::vector<Block> mBlocks;
+    std::vector<Block> m_blocks;
 
     void checkBlockUsage(std::size_t blockIndex)
     {
-        auto &block = mBlocks[blockIndex];
+        auto &block = m_blocks[blockIndex];
         if (block.occupied.none()) {
             delete[] block.data;
             block.data = nullptr;

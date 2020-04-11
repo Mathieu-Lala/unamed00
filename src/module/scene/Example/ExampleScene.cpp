@@ -4,61 +4,74 @@
  */
 
 #include <cmath>
+#include <iostream>
 
 #include <data/Component.hpp>
 
 #include "ExampleScene.hpp"
 
-bool ExampleScene::onCreate(const std::unique_ptr<ecs::World> &world)
+void ExampleScene::restartParty(const std::unique_ptr<ecs::World> &world)
+{
+    world->clearAll();
+
+    world->createEntity()
+    .add<CWithEvent>([this, &world](const graphic::Event &e) {
+        if (e.type == graphic::Event::KEY_PRESSED && e.key.code == graphic::KeyBoard::R)
+            this->restartParty(world);
+    });
+
+    m_gameClock = 0;
+    m_level = 0;
+
+    auto player = world->createEntity(); player
+    .add<CRectShape>(0.0f, 0.0f, 0.05f, 0.05f)
+    .add<CVelocity>(0.0f, 0.0f)
+    .add<CWithEvent>([player](const graphic::Event &e){
+        auto velocity = player.get<CVelocity>();
+
+        if (e.type == graphic::Event::KEY_PRESSED || e.type == graphic::Event::KEY_RELEASED) {
+            auto press = e.type == graphic::Event::KEY_PRESSED;
+            switch (e.key.code) {
+                case graphic::KeyBoard::Up:    velocity->y = press ?  0.05f : 0.0f; break;
+                case graphic::KeyBoard::Down:  velocity->y = press ? -0.05f : 0.0f; break;
+                case graphic::KeyBoard::Left:  velocity->x = press ? -0.05f : 0.0f; break;
+                case graphic::KeyBoard::Right: velocity->x = press ?  0.05f : 0.0f; break;
+                default: break;
+            }
+        }
+    });
+    this->m_player = player.m_id;
+
+    this->spawnEnnemies(world, 10);
+}
+
+void ExampleScene::spawnEnnemies(const std::unique_ptr<ecs::World> &world, int count)
 {
     constexpr float size = 100.0f;
 
-    constexpr float count = 200.0f;
     for (int i = 0; i != count; i++) {
-        const auto x = std::cos(i * 2 * M_PI / count);
-        const auto y = std::sin(i * 2 * M_PI / count);
+        const auto x = std::cos(i * 2 * M_PI / static_cast<float>(count));
+        const auto y = std::sin(i * 2 * M_PI / static_cast<float>(count));
 
         world->createEntity()
             .add<CRectShape>(x / 2.0f, y / 2.0f, 1 / size, 1 / size)
             .add<CVelocity>(x / 100.0f, y / 100.0f);
     }
 
-    auto player = world->createEntity()
-        .add<CRectShape>(0.0f, 0.0f, 0.05f, 0.05f)
-        .add<CVelocity>(0.0f, 0.0f);
+    world->flush();
+}
 
-    player.add<CWithEvent>([player](const graphic::Event &e){
-            auto velocity = player.get<CVelocity>();
-
-            if (e.type == graphic::Event::KEY_PRESSED) {
-                switch (e.key.code) {
-                    case graphic::KeyBoard::Up: velocity->y = 0.05f; break;
-                    case graphic::KeyBoard::Down: velocity->y = -0.05f; break;
-                    case graphic::KeyBoard::Left: velocity->x = -0.05f; break;
-                    case graphic::KeyBoard::Right: velocity->x = 0.05f; break;
-                    default: break;
-                }
-
-            } else if (e.type == graphic::Event::KEY_RELEASED) {
-                switch (e.key.code) {
-                    case graphic::KeyBoard::Up: velocity->y = 0.0f; break;
-                    case graphic::KeyBoard::Down: velocity->y = 0.0f; break;
-                    case graphic::KeyBoard::Left: velocity->x = 0.0f; break;
-                    case graphic::KeyBoard::Right: velocity->x = 0.0f; break;
-                    default: break;
-                }
-            }
-        });
-
-    m_player = player.m_id;
-
+bool ExampleScene::onCreate(const std::unique_ptr<ecs::World> &world)
+{
+    this->restartParty(world);
     return true;
 }
 
 constexpr bool collide(const CRectShape *a, const CRectShape *b)
 {
-    return a->x < b->x + b->w && a->x + a->w > b->x &&
-           a->y < b->y + b->h && a->h + a->y > b->y;
+    return a && b && a != b &&
+        a->x < b->x + b->w && a->x + a->w > b->x &&
+        a->y < b->y + b->h && a->h + a->y > b->y;
 }
 
 void ExampleScene::onUpdate(const std::unique_ptr<ecs::World> &world, float elapsedTime, const graphic::Event &event)
@@ -80,20 +93,27 @@ void ExampleScene::onUpdate(const std::unique_ptr<ecs::World> &world, float elap
 
     });
 
-    const auto withHitBox = world->entitiesWith<CRectShape>();
-    for (const auto &entity : withHitBox)
-        for (const auto &i : withHitBox)
-            if (entity.m_id != i.m_id && collide(entity.get<CRectShape>(), i.get<CRectShape>()))
-                world->destroyEntity(entity.m_id);
+    auto player = world->getEntityHandle(this->m_player);
 
-    world->tickSystem<CVelocity>([this, &world](CVelocity *velocity) {
-
-        if (velocity == world->getEntityHandle(this->m_player).get<CVelocity>()) return;
-
+    world->tickSystem<CVelocity>([this, &player](CVelocity *velocity) {
+        if (player.own(velocity)) return;
         velocity->x += ((std::rand() % 3) - 1) / 10000.0f;
         velocity->y += ((std::rand() % 3) - 1) / 10000.0f;
-
     });
+
+    for (const auto &entity : world->entitiesWith<const CRectShape>())
+        if (collide(player.get<const CRectShape>(), entity.get<const CRectShape>())) {
+            std::cout << "you died :(" << std::endl << "Your score: " << this->m_level << std::endl;
+            this->restartParty(world);
+            break;
+        }
+
+    this->m_gameClock += elapsedTime;
+    if (this->m_gameClock >= 5000) {
+        m_gameClock = 0.0f;
+        this->m_level++;
+        this->spawnEnnemies(world, this->m_level * 10);
+    }
 }
 
 unsigned int ExampleScene::getSkyColor()

@@ -11,6 +11,8 @@
 # include <limits>
 # include <type_traits>
 
+# include "config/api.hpp"
+
 namespace ecs {
 
 namespace component {
@@ -20,10 +22,9 @@ static_assert(std::is_unsigned_v<Mask>, "Mask type must be unsigned");
 
 constexpr auto MAX = std::numeric_limits<Mask>::digits;
 
-using ID = std::size_t;
+using ID = std::uint64_t;
 
 namespace {
-
 ID counter = 0ul;
 
 template<typename ComponentType>
