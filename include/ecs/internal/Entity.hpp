@@ -30,7 +30,7 @@ struct Handler {
         { return m_world.getComponent<ComponentType>(m_id); }
 
     template<typename ComponentType>
-    bool own(const ComponentType *component)
+    bool own(const ComponentType *component) const noexcept
         { return this->get<ComponentType>() == component; }
 
 };

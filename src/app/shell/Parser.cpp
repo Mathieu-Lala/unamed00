@@ -107,6 +107,7 @@ void shell::Parser::help(const std::string &command)
                 "\tvalue:\tnew value of name" << std::endl <<
                 "Available data:" << std::endl <<
                 "\twindow: rendering window of the application" << std::endl <<
+                "\tscene:  a scene to be played" << std::endl <<
             std::endl;
             break;
 
@@ -222,13 +223,31 @@ void shell::Parser::set(const std::vector<std::string> &command)
         return help("set");
     }
 
-    if (command[1] == "window") {
-        try {
+    switch (str2int(command[1].data())) {
+        case str2int("window"): try {
             const auto uid = static_cast<dll::Manager::UID>(std::stoi(command[2]));
-            if (!this->m_core.setWindowFromModule(uid))
-                std::cout << "Failed to the window from module: " << command[2] << std::endl;
+            if (!this->m_core.setWindowFromModule(uid)) {
+                std::cout << "Failed to set the window from module: " << command[2] << std::endl;
+            } else {
+                std::cout << "Window successfully set from module: " << command[2] << std::endl;
+            }
         } catch (...) {
             std::cout << "Invalid argument: " << command[2] << std::endl;
-        }
+        } break;
+
+        case str2int("scene"): try {
+            const auto uid = static_cast<dll::Manager::UID>(std::stoi(command[2]));
+            if (!this->m_core.setSceneFromModule(uid)) {
+                std::cout << "Failed to set the scene from module: " << command[2] << std::endl;
+            } else {
+                std::cout << "Scene successfully set from module: " << command[2] << std::endl;
+            }
+        } catch (...) {
+            std::cout << "Invalid argument: " << command[2] << std::endl;
+        } break;
+
+        default:
+            std::cout << "No such data: " << command[1] << std::endl;
+            break;
     }
 }

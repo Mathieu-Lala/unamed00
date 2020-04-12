@@ -126,6 +126,7 @@ bool Core::setSceneFromModule(const dll::Manager::UID &id)
         this->m_scene = ScenePtr(ctor(), dtor);
         if (!this->m_scene) return false;
 
+        this->m_world->clearAll();
         if (!this->m_scene->onCreate(this->m_world)) {
             std::cerr << "Failed to initialize the scene" << std::endl;
             this->m_scene.reset(nullptr);

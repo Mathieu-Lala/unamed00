@@ -11,6 +11,8 @@
 
 # include <graphic/IWindow.hpp>
 
+# include "Shader.hpp"
+
 class WindowGLFW : public graphic::IWindow {
 public:
     WindowGLFW() = default;
@@ -41,6 +43,8 @@ private:
     static void s_keyCallback(GLFWwindow *, int, int, int, int);
 
     static graphic::Event s_actifEvent;
+
+    Shader m_shader;
 
 };
 

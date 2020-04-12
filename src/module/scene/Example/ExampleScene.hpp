@@ -1,5 +1,5 @@
 /**
- * @file src/module/scene/example/ExampleScene.hpp
+ * @file src/module/scene/Example/ExampleScene.hpp
  *
  */
 
@@ -15,7 +15,9 @@ public:
 
     bool onCreate(const std::unique_ptr<ecs::World> &) override;
     void onUpdate(const std::unique_ptr<ecs::World> &, float, const graphic::Event &) override;
-    unsigned int getSkyColor() override;
+
+    unsigned int getSkyColor() override
+        { return 0x000000FF; }
 
 protected:
 private:

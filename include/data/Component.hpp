@@ -10,11 +10,22 @@
 
 # include <graphic/Event.hpp>
 
+# include "ecs/internal/Component.hpp"
+
+namespace data {
+
 struct CRectShape {
 
     float x, y, w, h;
     CRectShape(float xx, float yy, float ww, float hh) :
         x(xx), y(yy), w(ww), h(hh) { }
+
+    constexpr bool collide(const CRectShape *other) const noexcept
+    {
+        return other && this != other &&
+            this->x < other->x + other->w && this->x + this->w > other->x &&
+            this->y < other->y + other->h && this->h + this->y > other->y;
+    }
 
 };
 
@@ -33,7 +44,14 @@ struct CWithEvent {
 
 };
 
-#include "ecs/internal/Component.hpp"
+struct CColor {
+
+    float r, g, b, a;
+
+    CColor(float rr, float gg, float bb, float aa) :
+        r(rr), g(gg), b(bb), a(aa) { }
+
+};
 
 namespace {
 #define INIT_MASK(c) auto mask##c = ecs::component::getMask<c>();
@@ -41,8 +59,11 @@ namespace {
 INIT_MASK(CRectShape);
 INIT_MASK(CVelocity);
 INIT_MASK(CWithEvent);
+INIT_MASK(CColor);
 
 #undef INIT_MASK
 }
+
+} // namespace data
 
 #endif /* !COMPONENT_HPP_ */

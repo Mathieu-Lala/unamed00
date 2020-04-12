@@ -25,17 +25,6 @@ DISABLE_WARNING_POP
 #include "Window.hpp"
 #include "Keyboard.hpp"
 
-static int shaderProgram; /* tmp */
-
-std::string fileToString(const std::string_view path)
-{
-    std::ifstream f(path.data());
-    return std::string(
-        (std::istreambuf_iterator<char>(f)),
-        (std::istreambuf_iterator<char>( ))
-    );
-}
-
 bool WindowGLFW::init()
 {
     this->m_window = glfwCreateWindow(1080, 760, "", nullptr, nullptr);
@@ -49,26 +38,10 @@ bool WindowGLFW::init()
 
     glfwSetKeyCallback(this->m_window, s_keyCallback);
 
-    /* tmp */
-    auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    auto vertexShaderSource = fileToString(RESOURCE_DIR "shaders/simple.vs");
-    auto rawVertexShaderSource = vertexShaderSource.data();
-    glShaderSource(vertexShader, 1, &rawVertexShaderSource, nullptr);
-    glCompileShader(vertexShader);
+    m_shader.open(RESOURCE_DIR "shaders/simple.vs", RESOURCE_DIR "shaders/simple.fs");
 
-    auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    auto fragmentShaderSource = fileToString(RESOURCE_DIR "shaders/simple.fs");
-    auto rawFragmentShaderSource = fragmentShaderSource.data();
-    glShaderSource(fragmentShader, 1, &rawFragmentShaderSource, nullptr);
-    glCompileShader(fragmentShader);
-
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
 
     return true;
 }
@@ -134,17 +107,28 @@ void WindowGLFW::clear(unsigned int color)
 
 void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
 {
-    world->tickSystem<CRectShape>([this](CRectShape *shape) {
+    const auto getColor = [](const data::CRectShape *shape, const data::CColor *color) -> std::array<float, 4> {
+        return color ?
+            std::array { color->r, color->g, color->b, color->a } :
+            std::array { (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f), 1.0f };
+    };
+
+    constexpr unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
+
+    this->m_shader.use();
+
+    for (const auto &i : world->entitiesWith<const data::CRectShape>()) {
+
+        const auto shape = i.get<const data::CRectShape>();
+        const auto color = getColor(shape, i.get<const data::CColor>());
 
         const float vertices[] = {
             // position                                      // colors
-            shape->x + shape->w, shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
-            shape->x + shape->w, shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
-            shape->x,            shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
-            shape->x,            shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x + shape->w, shape->y + shape->h, 1.0f, color[0], color[1], color[2], color[3],
+            shape->x + shape->w, shape->y,            1.0f, color[0], color[1], color[2], color[3],
+            shape->x,            shape->y,            1.0f, color[0], color[1], color[2], color[3],
+            shape->x,            shape->y + shape->h, 1.0f, color[0], color[1], color[2], color[3],
         };
-
-        constexpr unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
 
         unsigned int VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -160,26 +144,23 @@ void WindowGLFW::draw(const std::unique_ptr<ecs::World> &world)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         // position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
         // color attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(GL_NONE);
-        glUseProgram(GL_NONE);
+        glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
 
-    });
+    }
+
+    glBindVertexArray(GL_NONE);
+    glUseProgram(GL_NONE);
 }
 
 graphic::Event WindowGLFW::s_actifEvent = {};

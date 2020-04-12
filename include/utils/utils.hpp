@@ -8,6 +8,7 @@
 
 # include <ctime>
 # include <string>
+# include <fstream>
 # include <vector>
 # include <sstream>
 
@@ -33,6 +34,15 @@ inline std::vector<std::string> explode(const std::string &str, char delim)
         if (each.size())
             tokens.push_back(each);
     return tokens;
+}
+
+inline std::string getContentFile(const std::string_view path)
+{
+    std::ifstream f(path.data());
+    return std::string(
+        (std::istreambuf_iterator<char>(f)),
+        (std::istreambuf_iterator<char>( ))
+    );
 }
 
 #endif /* !UTILS_HPP_ */

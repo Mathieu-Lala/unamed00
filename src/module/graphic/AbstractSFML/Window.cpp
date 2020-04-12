@@ -29,6 +29,9 @@ bool WindowSFML::init()
 
     gladLoadGLLoader(reinterpret_cast<GLADloadproc>(sf::Context::getFunction));
 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
     return m_shader.loadFromFile(RESOURCE_DIR "shaders/simple.vs", RESOURCE_DIR "shaders/simple.fs");
 }
 
@@ -79,17 +82,28 @@ void WindowSFML::clear(unsigned int color)
 
 void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
 {
-    world->tickSystem<const CRectShape>([this](const CRectShape *shape) {
+    const auto getColor = [](const data::CRectShape *shape, const data::CColor *color) -> std::array<float, 4> {
+        return color ?
+            std::array { color->r, color->g, color->b, color->a } :
+            std::array { (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f), 1.0f };
+    };
+
+    constexpr unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
+
+    sf::Shader::bind(&m_shader);
+
+    for (const auto &i : world->entitiesWith<const data::CRectShape>()) {
+
+        const auto shape = i.get<const data::CRectShape>();
+        const auto color = getColor(shape, i.get<const data::CColor>());
 
         const float vertices[] = {
             // position                                      // colors
-            shape->x + shape->w, shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
-            shape->x + shape->w, shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
-            shape->x,            shape->y,            1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
-            shape->x,            shape->y + shape->h, 1.0f, (shape->y + 1) / 2.0f, 0.0f, 1 - ((1 + shape->y) / 2.0f),
+            shape->x + shape->w, shape->y + shape->h, 1.0f, color[0], color[1], color[2], color[3],
+            shape->x + shape->w, shape->y,            1.0f, color[0], color[1], color[2], color[3],
+            shape->x,            shape->y,            1.0f, color[0], color[1], color[2], color[3],
+            shape->x,            shape->y + shape->h, 1.0f, color[0], color[1], color[2], color[3],
         };
-
-        constexpr unsigned int indices[] = { 0, 1, 3, 1, 2, 3 };
 
         unsigned int VBO, VAO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -105,26 +119,23 @@ void WindowSFML::draw(const std::unique_ptr<ecs::World> &world)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         // position attribute
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) 0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
 
         // color attribute
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *) (3 * sizeof(float)));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
-        sf::Shader::bind(&m_shader);
-        glBindVertexArray(VAO);
-
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
-        glBindVertexArray(GL_NONE);
-        sf::Shader::bind(nullptr);
+        glDrawElements(GL_TRIANGLES, sizeof(indices), GL_UNSIGNED_INT, 0);
 
         glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
         glDeleteBuffers(1, &EBO);
 
-    });
+    }
+
+    glBindVertexArray(GL_NONE);
+    sf::Shader::bind(nullptr);
 }
 
 bool WindowSFML::pollEvent(graphic::Event &out)
