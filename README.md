@@ -4,9 +4,9 @@ unamed00
 Ambition
 ------
 
-The main purpose of this project is to practice my C++, and learn new techniques or syntax.
+The main purpose of this project is to practice my C++, and learn new techniques, syntaxes, styles...
 
-The goal is to create a 3D game engine in network with a modular conception.
+The main goal is to create a 3D game engine in network with a modular conception.
 
 Screenshots
 ------
@@ -15,11 +15,11 @@ Screenshots
 
 An example of what you can do for now :
 
-An Asteroid like game : survive as much as wave as u can !
+An Asteroid like game : survive as much as waves as you can !
 
-![Screenshot Scene Example Wave 2](./resources/screenshots/2020-04-11_19-14-53.png?raw=true "Wave 2")
-![Screenshot Scene Example Wave 4](./resources/screenshots/2020-04-11_19-15-08.png?raw=true "Wave 4")
-![Screenshot Scene Example Wave 8](./resources/screenshots/2020-04-11_19-17-19.png?raw=true "Wave 8")
+![Screenshot Asteroid Wave 2](./resources/screenshots/2020-04-11_19-14-53.png?raw=true "Wave 2")
+![Screenshot Asteroid Wave 4](./resources/screenshots/2020-04-11_19-15-08.png?raw=true "Wave 4")
+![Screenshot Asteroid Wave 8](./resources/screenshots/2020-04-11_19-17-19.png?raw=true "Wave 8")
 
 Getting Started
 ------

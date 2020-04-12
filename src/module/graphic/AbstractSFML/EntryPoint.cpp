@@ -8,16 +8,16 @@
 
 #include <config/api.hpp>
 
+#if PROJECT_BUILD_TYPE == Debug
+# define LIBSFML(a) "sfml-" #a "-s-d.lib"
+#else
+# define LIBSFML(a) "sfml-" #a "-s.lib"
+#endif
+
 #if defined(OS_WINDOWS)
-# if PROJECT_BUILD_TYPE == Debug
-#  pragma comment(lib,"sfml-graphics-s-d.lib")
-#  pragma comment(lib,"sfml-window-s-d.lib")
-#  pragma comment(lib,"sfml-system-s-d.lib")
-# else
-#  pragma comment(lib,"sfml-graphics-s.lib")
-#  pragma comment(lib,"sfml-window-s.lib")
-#  pragma comment(lib,"sfml-system-s.lib")
-# endif
+# pragma comment(lib, LIBSFML(graphics))
+# pragma comment(lib, LIBSFML(system))
+# pragma comment(lib, LIBSFML(window))
 #endif
 
 #include "Window.hpp"
